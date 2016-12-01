@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
-
-public class EnemyUnit : MonoBehaviour {
+public enum UnitType { Sword, Pike, Mualer, Gunner, Mage, Cannon };
+public class EnemyUnit : MonoBehaviour
+{
     // public Vector3 MyPosition;
     //   public GameObject MyGameObject;
     public Animator anim;
-    
+
     private bool die = false;
     public int MaxHp;
     public int CurHp;
@@ -18,11 +19,11 @@ public class EnemyUnit : MonoBehaviour {
     public float FinalPosition;
     public int Level;
     private SpriteRenderer sprite;
-    private bool FireCurse=false;
-    private int burnlevel=0;
-    private bool ElectricCurse=false;
+    private bool FireCurse = false;
+    private int burnlevel = 0;
+    private bool ElectricCurse = false;
     private bool beattack = false;
-    public enum UnitType {Sword,Pike,Mualer,Gunner, Mage, Cannon }
+
     public UnitType Mytype;
     public Element Myelement;
     //public bool Onstage; use for object pooling **** if have to optimize*****
@@ -49,8 +50,8 @@ public class EnemyUnit : MonoBehaviour {
         ElectricCurse = false;
         FireCurse = false;
         Mytype = T;
-       // if (Mytype == UnitType.Gunner) Debug.Log("Mygun");
-        FinalPosition =-5f;
+        // if (Mytype == UnitType.Gunner) Debug.Log("Mygun");
+        FinalPosition = -5f;
         Level = level;
         Myelement = E;
         anim = this.GetComponent<Animator>();
@@ -68,7 +69,7 @@ public class EnemyUnit : MonoBehaviour {
     }
     public enum WinLose { win, lose, equal }
 
-    private WinLose checkwinlos( Element Another)
+    private WinLose checkwinlos(Element Another)
     {
         Element My = this.Myelement;
 
@@ -149,14 +150,16 @@ public class EnemyUnit : MonoBehaviour {
             {
                 switch (Slime.Myelement)
                 {
-                    case (Element.Water): this.CurHp = this.CurHp - Damage;
+                    case (Element.Water):
+                        this.CurHp = this.CurHp - Damage;
                         if (this.CurHp <= 0)
                         {
                             die = true;
                             TearDrop.Instance.incresing();
                             StopAllCoroutines();
                             StartCoroutine("Die");
-                        } return;
+                        }
+                        return;
                     case (Element.Fire):
                         if (FireCurse)
                         {
@@ -168,7 +171,8 @@ public class EnemyUnit : MonoBehaviour {
                         }
                         break;
                     default: break;
-                } this.CurHp = this.CurHp - ((Damage - this.Def < 0) ? 0 : Damage - this.Def);
+                }
+                this.CurHp = this.CurHp - ((Damage - this.Def < 0) ? 0 : Damage - this.Def);
             }
             else this.CurHp = this.CurHp - ((Damage - this.Def < 0) ? 0 : Damage - this.Def);
             if (this.CurHp <= 0)
@@ -183,7 +187,7 @@ public class EnemyUnit : MonoBehaviour {
                 StartCoroutine("Die");
 
             }
-            blood.transform.localPosition = blood.transform.localPosition - new Vector3((this.MaxHp - this.CurHp)*2f / this.MaxHp, 0f, 0f);
+            blood.transform.localPosition = blood.transform.localPosition - new Vector3((this.MaxHp - this.CurHp) * 2f / this.MaxHp, 0f, 0f);
         }
 
     }
@@ -192,7 +196,7 @@ public class EnemyUnit : MonoBehaviour {
 
         float tt = anim.GetCurrentAnimatorStateInfo(0).length;
         Debug.Log(tt + "aass");
-       yield return new WaitForSeconds(tt+0.1f);
+        yield return new WaitForSeconds(tt + 0.1f);
         Destroy(gameObject);
     }
     IEnumerator BeAttacked()
@@ -215,17 +219,17 @@ public class EnemyUnit : MonoBehaviour {
         RaycastHit2D Hit = new RaycastHit2D();
         Unit Slime = new Unit();
         bool mageFoundSlime = false;
-        while (this.transform.position.x > FinalPosition&&!die)
+        while (this.transform.position.x > FinalPosition && !die)
         {
             yield return null;
             if (!ElectricCurse)
-            { 
-                
-               
+            {
 
-                if (Mytype != UnitType.Mage && Mytype != UnitType.Cannon&&Mytype!=UnitType.Gunner)
-                {   
-                   
+
+
+                if (Mytype != UnitType.Mage && Mytype != UnitType.Cannon && Mytype != UnitType.Gunner)
+                {
+
                     Hit = Physics2D.Raycast(this.transform.position, Vector2.left, Range, 1 << LayerMask.NameToLayer("Soil"));
                     if (Hit.collider != null)
                     {
@@ -233,7 +237,7 @@ public class EnemyUnit : MonoBehaviour {
                         if (this.gameObject == null) break;
                         else if (Hit.transform.gameObject != null)
                         {
-                          Slime = Hit.transform.gameObject.GetComponent<Unit>();
+                            Slime = Hit.transform.gameObject.GetComponent<Unit>();
                             Slime.Attacked(this.ATP, Slime.checkwinlos(Myelement));
 
                         }
@@ -249,12 +253,13 @@ public class EnemyUnit : MonoBehaviour {
                             if (this.gameObject == null) break;
                             else if (Hit.transform.gameObject != null)
                             {
-                               Slime = Hit.transform.gameObject.GetComponent<Unit>();
+                                Slime = Hit.transform.gameObject.GetComponent<Unit>();
                                 Slime.Attacked(this.ATP, Slime.checkwinlos(Myelement));
                                 if (Slime.Myelement == Element.Electric && Slime.Level >= 3)
-                                        {
-                                         if (!ElectricCurse) { ElectricCurse = true; StartCoroutine("Shock"); } continue;
-                                        }
+                                {
+                                    if (!ElectricCurse) { ElectricCurse = true; StartCoroutine("Shock"); }
+                                    continue;
+                                }
                             }
                             yield return new WaitForSeconds(Attackspeed);
                         }
@@ -262,29 +267,29 @@ public class EnemyUnit : MonoBehaviour {
                         {
 
 
-                             Hit = Physics2D.Raycast(this.transform.position, Vector2.left, Range, 1 << LayerMask.NameToLayer("Wall"));
-                             if (Hit.collider != null)
-                             {
+                            Hit = Physics2D.Raycast(this.transform.position, Vector2.left, Range, 1 << LayerMask.NameToLayer("Wall"));
+                            if (Hit.collider != null)
+                            {
 
-                                 anim.SetBool("Attack", true);
-                             
-                                 Wall.Instance.HP = ((this.ATP / 3 - Wall.Instance.def) <= 0) ? Wall.Instance.HP - 1 : Wall.Instance.HP - (this.ATP / 3 - Wall.Instance.def);
-                     
-                                     Destroy(gameObject);
+                                anim.SetBool("Attack", true);
 
-                                 yield return new WaitForSeconds(Attackspeed);
+                                Wall.Instance.HP = ((this.ATP / 3 - Wall.Instance.def) <= 0) ? Wall.Instance.HP - 1 : Wall.Instance.HP - (this.ATP / 3 - Wall.Instance.def);
+
+                                Destroy(gameObject);
+
+                                yield return new WaitForSeconds(Attackspeed);
                             }
-                              else
-                                {
-                                    if (this.gameObject == null) break; 
-                                 this.transform.position += Vector3.left * Time.deltaTime * Speed;
+                            else
+                            {
+                                if (this.gameObject == null) break;
+                                this.transform.position += Vector3.left * Time.deltaTime * Speed;
 
-                                } 
+                            }
                         }
-                        
+
                     }
                 }
-                else if(Mytype==UnitType.Gunner)
+                else if (Mytype == UnitType.Gunner)
                 {
                     GameObject Bullet = this.transform.FindChild("Bullet").gameObject;
                     Hit = Physics2D.Raycast(this.transform.position, Vector2.left, 1f, 1 << LayerMask.NameToLayer("Wall"));
@@ -297,12 +302,12 @@ public class EnemyUnit : MonoBehaviour {
 
                         Destroy(gameObject);
 
-                     //   yield return new WaitForSeconds(Attackspeed);
+                        //   yield return new WaitForSeconds(Attackspeed);
                     }
-                  
-                      Hit = Physics2D.Raycast(this.transform.position, Vector2.left, Range, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
 
-                   if (Hit.collider != null)
+                    Hit = Physics2D.Raycast(this.transform.position, Vector2.left, Range, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
+
+                    if (Hit.collider != null)
                     {
                         Bullet.transform.position = this.transform.position;
                         anim.SetBool("Attack", true);
@@ -313,50 +318,51 @@ public class EnemyUnit : MonoBehaviour {
                         {
                             yield return null;
                             Bullet.transform.position += Vector3.left * 10f * Time.deltaTime;
-                            
+
                             anim.SetBool("Attack", false);
                             Hit = Physics2D.Raycast(Bullet.transform.position, Vector2.zero, 5f, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
-                         
-                                //  Debug.DrawRay(new Vector3(this.transform.position.x - 1f, this.transform.position.y - 3f, this.transform.position.z), Vector2.up * 6f, Color.yellow, 5f);
-                                if (this.gameObject == null) break;
-                                if (Hit.collider != null)
-                                {
-                                    Slime = Hit.transform.gameObject.GetComponent<Unit>();
-                                    Bullet.SetActive(false);
-                                   
-                                     Slime.Attacked(this.ATP, Slime.checkwinlos(Myelement));
-                                     break;
-                                
 
-                               } 
-                        } Bullet.SetActive(false);
+                            //  Debug.DrawRay(new Vector3(this.transform.position.x - 1f, this.transform.position.y - 3f, this.transform.position.z), Vector2.up * 6f, Color.yellow, 5f);
+                            if (this.gameObject == null) break;
+                            if (Hit.collider != null)
+                            {
+                                Slime = Hit.transform.gameObject.GetComponent<Unit>();
+                                Bullet.SetActive(false);
+
+                                Slime.Attacked(this.ATP, Slime.checkwinlos(Myelement));
+                                break;
+
+
+                            }
+                        }
+                        Bullet.SetActive(false);
                         yield return new WaitForSeconds(Attackspeed);
 
 
                         if (this.gameObject == null) break;
                     }
-                   else
-                   {
-                       this.transform.position += Vector3.left * Time.deltaTime * Speed;
-                   }
+                    else
+                    {
+                        this.transform.position += Vector3.left * Time.deltaTime * Speed;
+                    }
 
 
                 }
 
-                else if(Mytype == UnitType.Mage)
+                else if (Mytype == UnitType.Mage)
                 {
                     mageFoundSlime = false;
                     Hit = Physics2D.Raycast(this.transform.position, Vector2.left, Range, 1 << LayerMask.NameToLayer("Wall"));
                     if (Hit.collider != null)
                     {
                         anim.SetBool("Attack", true);
-                        Wall.Instance.HP = ((this.ATP*3 - Wall.Instance.def) <= 0) ? Wall.Instance.HP - 3 : Wall.Instance.HP - (this.ATP*3 - Wall.Instance.def);
+                        Wall.Instance.HP = ((this.ATP * 3 - Wall.Instance.def) <= 0) ? Wall.Instance.HP - 3 : Wall.Instance.HP - (this.ATP * 3 - Wall.Instance.def);
                         Destroy(gameObject);
                     }
-                    Hit = Physics2D.Raycast(this.transform.position, Vector2.left, 1f,1<<LayerMask.NameToLayer("Soil")| 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
+                    Hit = Physics2D.Raycast(this.transform.position, Vector2.left, 1f, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
                     if (Hit.collider != null)
                     {
-                      
+
                         anim.SetBool("Attack", true);
                         this.gameObject.transform.FindChild("Power").gameObject.SetActive(true);
                         mageFoundSlime = true;
@@ -377,22 +383,22 @@ public class EnemyUnit : MonoBehaviour {
 
                             }
                         }
-                      
+
                         yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
                         anim.SetBool("Attack", false);
                         this.gameObject.transform.FindChild("Power").gameObject.SetActive(false);
-                        Debug.Log("sdasdasd"+anim.GetCurrentAnimatorStateInfo(0).length);
+                        Debug.Log("sdasdasd" + anim.GetCurrentAnimatorStateInfo(0).length);
                         yield return new WaitForSeconds(Attackspeed - anim.GetCurrentAnimatorStateInfo(0).length);
                         mageFoundSlime = false;
                         if (this.gameObject == null) break;
                         continue;
                     }
-                     else
-                     {
-                         if (this.gameObject == null) break;
-                         this.transform.position += Vector3.left * Time.deltaTime * Speed;
-                         yield return null;
-                     }
+                    else
+                    {
+                        if (this.gameObject == null) break;
+                        this.transform.position += Vector3.left * Time.deltaTime * Speed;
+                        yield return null;
+                    }
                 }
                 else
                 {
@@ -420,7 +426,7 @@ public class EnemyUnit : MonoBehaviour {
 
                             anim.SetBool("Attack", false);
                             Hits = Physics2D.RaycastAll(Bullet.transform.position, Vector2.zero, 5f, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
-                          
+
                             for (int i = 0; i < Hits.Length; i++)
                             {
                                 //  Debug.DrawRay(new Vector3(this.transform.position.x - 1f, this.transform.position.y - 3f, this.transform.position.z), Vector2.up * 6f, Color.yellow, 5f);
@@ -440,8 +446,9 @@ public class EnemyUnit : MonoBehaviour {
                                     }
                                 }
 
-                            } 
-                        } Bullet.SetActive(false);
+                            }
+                        }
+                        Bullet.SetActive(false);
                         yield return new WaitForSeconds(Attackspeed);
 
 
@@ -455,9 +462,9 @@ public class EnemyUnit : MonoBehaviour {
 
             anim.SetBool("Attack", false);
         }///End While
-        ///Move To Camp of enemy(infont of enemy)
-        if (this.gameObject != null) 
-        this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector2(FinalPosition, this.transform.position.y), this.Speed * Time.deltaTime);
+         ///Move To Camp of enemy(infont of enemy)
+        if (this.gameObject != null)
+            this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector2(FinalPosition, this.transform.position.y), this.Speed * Time.deltaTime);
 
         EndGame.Instance.LoseEnd();
 
@@ -467,13 +474,14 @@ public class EnemyUnit : MonoBehaviour {
     IEnumerator Shock()
     {
         int i = 0;
-        while (i<20)
+        while (i < 20)
         {
-           // Debug.Log("imin");
-            this.transform.Translate(Vector3.right * Time.deltaTime * 8f); 
+            // Debug.Log("imin");
+            this.transform.Translate(Vector3.right * Time.deltaTime * 8f);
             yield return new WaitForSeconds(0.01f);
             i++;
-        } yield return new WaitForSeconds(0.5f);
+        }
+        yield return new WaitForSeconds(0.5f);
         ElectricCurse = false;
 
     }
@@ -481,14 +489,15 @@ public class EnemyUnit : MonoBehaviour {
     {
         for (int i = 0; i < 5; i++)
         {
-            this.CurHp=this.CurHp-burnlevel;
+            this.CurHp = this.CurHp - burnlevel;
             if (this.CurHp <= 0)
             {
                 TearDrop.Instance.incresing(); Destroy(gameObject);
             }
             yield return new WaitForSeconds(1f);
 
-        } FireCurse = false; burnlevel = 0;
+        }
+        FireCurse = false; burnlevel = 0;
     }
     private void checkLevel(int newlevel)
     {/*
@@ -539,14 +548,15 @@ public class EnemyUnit : MonoBehaviour {
         }*/
         switch (Mytype)
         {
-            case (UnitType.Sword): CurHp = MaxHp = 360+WaveControl.Instance.ADDHP; ATP = 70 + WaveControl.Instance.ADDamage ; Def = 10; Speed = 5; Attackspeed = 4f; Range = 1f; break;
+            case (UnitType.Sword): CurHp = MaxHp = 360 + WaveControl.Instance.ADDHP; ATP = 70 + WaveControl.Instance.ADDamage; Def = 10; Speed = 5; Attackspeed = 4f; Range = 1f; break;
             case (UnitType.Pike): CurHp = MaxHp = 300 + WaveControl.Instance.ADDHP; ATP = 80 + WaveControl.Instance.ADDamage; Def = 20; Speed = 3; Attackspeed = 2.5f; Range = 2f; break;
             case (UnitType.Mualer): CurHp = MaxHp = 200 + WaveControl.Instance.ADDHP; ATP = 100 + WaveControl.Instance.ADDamage; Def = 10; Speed = 2; Attackspeed = 1f; Range = 1f; break;
             case (UnitType.Mage): CurHp = MaxHp = 160 + WaveControl.Instance.ADDHP; ATP = 80 + WaveControl.Instance.ADDamage; Def = 10; Speed = 2; Attackspeed = 2f; Range = 1f; break;
             case (UnitType.Gunner): CurHp = MaxHp = 500 + WaveControl.Instance.ADDHP; ATP = 40 + WaveControl.Instance.ADDamage; Def = 20; Speed = 1; Attackspeed = 1f; Range = 60f; break;
             case (UnitType.Cannon): CurHp = MaxHp = 100 + WaveControl.Instance.ADDHP; ATP = 150 + WaveControl.Instance.ADDamage; Def = 0; Speed = 3; Attackspeed = -20f; Range = 60f; break;
 
-        } Attackspeed = 1.5f - (Attackspeed * 0.12f);
+        }
+        Attackspeed = 1.5f - (Attackspeed * 0.12f);
 
 
     }

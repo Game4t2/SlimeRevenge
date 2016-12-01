@@ -83,14 +83,14 @@ public class WaveControl : MonoBehaviour {
                 Human.SetActive(true);
                 switch (ranType)
                 {
-                    case (0): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnit.UnitType.Sword, 1); break;
-                    case (1): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnit.UnitType.Pike, 1); break;
-                    case (2): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnit.UnitType.Mualer, 1); break;
-                    case (3): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnit.UnitType.Gunner, 1);  break;
-                    case (4): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnit.UnitType.Mage, 1); break;
-                    case (5): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnit.UnitType.Cannon, 1); canon[rancout] = true; break;
+                    case (0): Human.AddComponent<EnemyUnit>().Set(Element.Normal, UnitType.Sword, 1); break;
+                    case (1): Human.AddComponent<EnemyUnit>().Set(Element.Normal, UnitType.Pike, 1); break;
+                    case (2): Human.AddComponent<EnemyUnit>().Set(Element.Normal, UnitType.Mualer, 1); break;
+                    case (3): Human.AddComponent<EnemyUnit>().Set(Element.Normal, UnitType.Gunner, 1);  break;
+                    case (4): Human.AddComponent<EnemyUnit>().Set(Element.Normal, UnitType.Mage, 1); break;
+                    case (5): Human.AddComponent<EnemyUnit>().Set(Element.Normal, UnitType.Cannon, 1); canon[rancout] = true; break;
                        
-                  //  default: Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnit.UnitType.Sword, 1); break;
+                  //  default: Human.AddComponent<EnemyUnit>().Set(Element.Normal, UnitType.Sword, 1); break;
                 }
 
 
