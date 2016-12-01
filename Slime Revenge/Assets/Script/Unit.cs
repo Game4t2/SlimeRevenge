@@ -5,32 +5,32 @@ using System.Collections.Generic;
 ///Class For create Normal Unit
 /// </summary>
  
- public enum Element { Normal=0,Fire=1, Water=2,Grass=3,Electric=4,Soil=5 }
+ 
 public class Unit : MonoBehaviour {
    // public Vector3 MyPosition;
   // public GameObject MyGameObject;
     public Animator anim;
     private bool bekilled=false;
-    private bool Ended;
-    private bool CanonEmpty=true;
+    private bool ended;
+    private bool canonEmpty=true;
     public bool hited=false;
-    private GameObject Bullet;
-    public List<GameObject> Active;
+    private GameObject bullet;
+    public List<GameObject> active;
     private SpriteRenderer sprite;
-    public List<GameObject> DisActive;
-    public int MaxHp;
-    public int CurHp;
-    public int Def;
-    public int ATP;
-    public float Range;
-    public float Speed;
-    public float Attackspeed;
-    public float FinalPosition;
-    public int Level;
+    public List<GameObject> inActive;
+    public int maxHp;
+    public int curHp;
+    public int def;
+    public int atp;
+    public float range;
+    public float speed;
+    public float attackSpeed;
+    public float finalPosition;
+    public int level;
     private bool beattack=false;
    // public TouchDeploy Mycontrol;
   
-    public Element Myelement;
+    public Element myElement;
 
 
     public Element CheckwhichElement(int x)
@@ -47,20 +47,20 @@ public class Unit : MonoBehaviour {
 
     }
 
-    public void Set(Element E,int level=1)
+    public void Set(Element e,int level=1)
     {
-        Ended = false;
-        if(Active==null)
-        Active = TouchDeploy.Instance().Actives[(int)E];
+        ended = false;
+        if(active==null)
+        active = TouchDeploy.Instance().Actives[(int)e];
 
-        if (DisActive == null)
-        DisActive = TouchDeploy.Instance().DisActives[(int)E];
+        if (inActive == null)
+        inActive = TouchDeploy.Instance().DisActives[(int)e];
        
-        FinalPosition = 60f;
-        Level = level;
-        Myelement = E;
-        anim = this.GetComponent<Animator>(); 
-        checkLevel(Level);
+        finalPosition = 60f;
+        this.level = level;
+        myElement = e;
+        anim = this.GetComponent<Animator>();
+        checkLevel(this.level);
     //    this.GetComponent<BoxCollider2D>().que
         StartCoroutine("walk");
            }
@@ -76,11 +76,11 @@ public class Unit : MonoBehaviour {
    }
    public void End()
    {
-       if (!Ended)
+       if (!ended)
        {
-           Ended = true;
+           ended = true;
 
-           if (this.Myelement == Element.Normal && Level >= 5)
+           if (this.myElement == Element.Normal && level >= 5)
            {
                SkillUse.Instance.HeroOnStage = false;
            }
@@ -103,8 +103,8 @@ public class Unit : MonoBehaviour {
       //  Debug.Log(LayerMask.LayerToName(this.gameObject.layer));
         sprite.color = Color.white;
         beattack = false;
-        Active.Remove(gameObject);
-        DisActive.Add(gameObject);
+        active.Remove(gameObject);
+        inActive.Add(gameObject);
         anim.SetBool("Death", false);
         anim.SetBool("Attack", false);
         gameObject.SetActive(false); anim.SetInteger("State", 0);
@@ -114,12 +114,10 @@ public class Unit : MonoBehaviour {
 
     }
 
-    public enum WinLose {win,lose,equal}
 
     public WinLose checkwinlos(Element Another)
     {
-        Element My = Myelement;
-        if (My == Element.Fire)
+        if (myElement == Element.Fire)
         {
             switch(Another){
                 case(Element.Water):
@@ -130,7 +128,7 @@ public class Unit : MonoBehaviour {
                 }
         }
         
-        else if (My == Element.Electric)
+        else if (myElement == Element.Electric)
         {
             switch(Another){ case(Element.Fire):
                              case(Element.Soil):return WinLose.lose;
@@ -140,7 +138,7 @@ public class Unit : MonoBehaviour {
            }
 
         }
-        else if (My == Element.Grass)
+        else if (myElement == Element.Grass)
         {
             switch (Another)
             {
@@ -152,7 +150,7 @@ public class Unit : MonoBehaviour {
             }
 
         }
-        else if (My == Element.Soil)
+        else if (myElement == Element.Soil)
         {
             switch (Another)
             {
@@ -164,7 +162,7 @@ public class Unit : MonoBehaviour {
             }
 
         }
-        else if (My == Element.Water)
+        else if (myElement == Element.Water)
         {
             switch (Another)
             {
@@ -180,22 +178,22 @@ public class Unit : MonoBehaviour {
 
     } 
    
-    public void Attacked(int Atack,WinLose EnemyWinLose,bool CanonShot=false)
+    public void Attacked(int attack,WinLose enemyWinLose,bool canonShot=false)
     {
-        if (CanonShot)  
+        if (canonShot)  
             StartCoroutine("BecanonShot");
         if (!beattack)
         {
             beattack = true;
             StartCoroutine("BeAttacked");
         }
-        int Damage = Atack;
-        if (EnemyWinLose == WinLose.win) { Damage *= 2; }
-        else if ((EnemyWinLose == WinLose.lose)) { Damage =Damage/2; }
+        int Damage = attack;
+        if (enemyWinLose == WinLose.win) { Damage *= 2; }
+        else if ((enemyWinLose == WinLose.lose)) { Damage =Damage/2; }
         
-        Damage=Damage<Def?0:Damage-Def; 
-        this.CurHp = this.CurHp -Damage;
-        if (CurHp <= 0)
+        Damage=Damage<def?0:Damage-def; 
+        this.curHp = this.curHp -Damage;
+        if (curHp <= 0)
         {
             ///Ver Optimize by using Object pooling
             /// 
@@ -238,8 +236,8 @@ public class Unit : MonoBehaviour {
    
     public bool CheckSameElement(out GameObject touse)
     {
-        if (this.Myelement == Element.Normal) { touse = null; return false; }
-        foreach (GameObject x in Active)
+        if (this.myElement == Element.Normal) { touse = null; return false; }
+        foreach (GameObject x in active)
         {
             if (x != this.gameObject)
             {
@@ -263,7 +261,7 @@ public class Unit : MonoBehaviour {
         RaycastHit2D Hit=new RaycastHit2D();
         bool Found = false;
        GameObject another;
-        while (this.transform.position.x < FinalPosition)
+        while (this.transform.position.x < finalPosition)
         {
             yield return null;
          //EatAnother
@@ -274,7 +272,7 @@ public class Unit : MonoBehaviour {
                 {
                     if (another.gameObject.activeSelf != false)
                     {
-                        this.transform.position = Vector3.MoveTowards(this.transform.position, another.transform.position, this.Speed * 3f * Time.deltaTime);
+                        this.transform.position = Vector3.MoveTowards(this.transform.position, another.transform.position, this.speed * 3f * Time.deltaTime);
                         yield return null;
                         if (another.gameObject.activeSelf == false)
                         {
@@ -288,11 +286,11 @@ public class Unit : MonoBehaviour {
                 } if (!desDW)
                 {
                     Unit Unitanother = another.GetComponent<Unit>();
-                    this.Level = (Unitanother.Level > this.Level) ? Unitanother.Level + 1 : this.Level + 1;
-                    this.Level = (this.Level >= 5) ? 5 : this.Level;
-                    this.CurHp = Unitanother.CurHp + this.CurHp;
-                    checkLevel(Level);
-                    if (this.Level >= 3)
+                    this.level = (Unitanother.level > this.level) ? Unitanother.level + 1 : this.level + 1;
+                    this.level = (this.level >= 5) ? 5 : this.level;
+                    this.curHp = Unitanother.curHp + this.curHp;
+                    checkLevel(level);
+                    if (this.level >= 3)
                     {
                         anim.SetInteger("State", 2);
 
@@ -306,9 +304,9 @@ public class Unit : MonoBehaviour {
             /////
 
             /////Check Attacked Enemy
-            if (!(this.Myelement == Element.Normal && Level >=4))/// CheckEnemy (checkthis is maleenunit(Element+MaleeType))
+            if (!(this.myElement == Element.Normal && level >=4))/// CheckEnemy (checkthis is maleenunit(Element+MaleeType))
             {
-                Hit = Physics2D.Raycast(this.transform.position, Vector2.right, Range, 1 << LayerMask.NameToLayer("EUnit"));
+                Hit = Physics2D.Raycast(this.transform.position, Vector2.right, range, 1 << LayerMask.NameToLayer("EUnit"));
                 if (Hit.collider != null)
                 {
 
@@ -320,40 +318,40 @@ public class Unit : MonoBehaviour {
                         if (Human.transform.gameObject != null)
                             Human.Attacked(this);
                     }
-                    yield return new WaitForSeconds(Attackspeed);
+                    yield return new WaitForSeconds(attackSpeed);
                     anim.SetBool("Attack", false);
                 }
 
-                else { this.transform.position += Vector3.right * Time.deltaTime * Speed; }
+                else { this.transform.position += Vector3.right * Time.deltaTime * speed; }
             }
 
-            else if(Myelement==Element.Normal&&Level==4)////Attack of canon
+            else if(myElement==Element.Normal&&level==4)////Attack of canon
             {
-                Bullet = this.transform.GetChild(0).transform.gameObject;
-                if (CanonEmpty)
+                bullet = this.transform.GetChild(0).transform.gameObject;
+                if (canonEmpty)
                 {
                     Hit = Physics2D.Raycast(this.transform.position, Vector2.left, 1f, 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Soil"));
                     if (Hit.collider != null)
                     {
-                        Bullet.transform.position = this.transform.position;
+                        bullet.transform.position = this.transform.position;
                         another = Hit.transform.gameObject;
-                        Bullet.GetComponent<SpriteRenderer>().sprite = Bullet.GetComponent<Bullet>().Getsprite(another.GetComponent<Unit>().Myelement);
+                        bullet.GetComponent<SpriteRenderer>().sprite = bullet.GetComponent<Bullet>().Getsprite(another.GetComponent<Unit>().myElement);
                     
-                        Bullet.SetActive(true);
+                        bullet.SetActive(true);
                      
                        
                          another.GetComponent<Unit>().End();
-                        CanonEmpty = false;
+                        canonEmpty = false;
 
                     }
                     else if (this.transform.position.x < 3f)
                     {
-                        this.transform.position += Vector3.right * Time.deltaTime * Speed;
+                        this.transform.position += Vector3.right * Time.deltaTime * speed;
                     }
                 }
-                if (!CanonEmpty)
+                if (!canonEmpty)
                 {
-                    Hit = Physics2D.Raycast(this.transform.position, Vector2.right, Range, 1 << LayerMask.NameToLayer("EUnit"));
+                    Hit = Physics2D.Raycast(this.transform.position, Vector2.right, range, 1 << LayerMask.NameToLayer("EUnit"));
                     if (Hit.collider != null)
                     {
                         Vector3 Position = Hit.transform.position;
@@ -362,13 +360,13 @@ public class Unit : MonoBehaviour {
                         yield return new WaitForSeconds(0.1f);
                         anim.SetBool("Attack", false);
                         
-                        while (Bullet.transform.position.x < Position.x)
+                        while (bullet.transform.position.x < Position.x)
                         {
                            
-                            Bullet.transform.position += Vector3.right*(Time.deltaTime*10f);
+                            bullet.transform.position += Vector3.right*(Time.deltaTime*10f);
                             yield return null;
                         }
-                        Bullet.GetComponent<Animator>().SetInteger("Element", Bullet.GetComponent<Bullet>().elementvalue);
+                        bullet.GetComponent<Animator>().SetInteger("Element", bullet.GetComponent<Bullet>().elementvalue);
                      
                        
                         RaycastHit2D[] Hits = Physics2D.RaycastAll(Position - new Vector3(1f, 0f, 0f), Vector2.right, 6f, 1 << LayerMask.NameToLayer("EUnit"));
@@ -387,26 +385,26 @@ public class Unit : MonoBehaviour {
                             }
                         }//Debug.Log(Bullet.GetComponent<Animator>().playbackTime);
 
-                        yield return new WaitForSeconds(Bullet.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length); Bullet.SetActive(false);
-                        Bullet.SetActive(false); Bullet.GetComponent<Animator>().SetInteger("Element", 7);
+                        yield return new WaitForSeconds(bullet.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length); bullet.SetActive(false);
+                        bullet.SetActive(false); bullet.GetComponent<Animator>().SetInteger("Element", 7);
                        // yield return new WaitForSeconds(Attackspeed);
                      
-                        CanonEmpty = true;
+                        canonEmpty = true;
                     }
                     else if (this.transform.position.x < 3f)
                     {
-                        this.transform.position += Vector3.right * Time.deltaTime * Speed;
+                        this.transform.position += Vector3.right * Time.deltaTime * speed;
                     }
                 }
             }
 
 
-            else if (Myelement == Element.Normal && Level == 5)////Attack of KingGuard
+            else if (myElement == Element.Normal && level == 5)////Attack of KingGuard
             {
                 Found = false;
                 for (int i = 0; i < 3; i++)
                 {
-                    RaycastHit2D[] Hits = Physics2D.RaycastAll(new Vector2(this.transform.position.x, GameObject.Find("Len").transform.GetChild(i).transform.position.y), Vector2.right, Range, 1 << LayerMask.NameToLayer("EUnit"));
+                    RaycastHit2D[] Hits = Physics2D.RaycastAll(new Vector2(this.transform.position.x, GameObject.Find("Len").transform.GetChild(i).transform.position.y), Vector2.right, range, 1 << LayerMask.NameToLayer("EUnit"));
                     if (Hits.Length < 1) continue;
                     this.gameObject.transform.GetChild(0).gameObject.SetActive(true);
                     foreach (RaycastHit2D hit in Hits)
@@ -426,11 +424,11 @@ public class Unit : MonoBehaviour {
                     }
                 } if (!Found)
                 {
-                    this.transform.position += Vector3.right * Time.deltaTime * Speed;
+                    this.transform.position += Vector3.right * Time.deltaTime * speed;
                 }
                 else
                 {
-                    yield return new WaitForSeconds(Attackspeed);
+                    yield return new WaitForSeconds(attackSpeed);
 
                     this.gameObject.transform.GetChild(0).gameObject.SetActive(false);
                     anim.SetBool("Attack", false);
@@ -441,13 +439,13 @@ public class Unit : MonoBehaviour {
               Hit = Physics2D.Raycast(this.transform.position, Vector2.right, 1f, 1 << LayerMask.NameToLayer("Ewall"));
               if (Hit.collider != null)
               {
-                  Ewall.Instance.HP = (Ewall.Instance.def >= this.ATP) ? Ewall.Instance.HP - 1 : Ewall.Instance.HP - (this.ATP - Ewall.Instance.def);
+                  Ewall.Instance.HP = (Ewall.Instance.def >= this.atp) ? Ewall.Instance.HP - 1 : Ewall.Instance.HP - (this.atp - Ewall.Instance.def);
                   End();
               }
 
         }///End While
         ///Move To Camp of enemy(infont of enemy)
-        this.transform.position = Vector3.MoveTowards(this.transform.position,new Vector2(FinalPosition,this.transform.position.y), this.Speed* Time.deltaTime);
+        this.transform.position = Vector3.MoveTowards(this.transform.position,new Vector2(finalPosition,this.transform.position.y), this.speed* Time.deltaTime);
         End();
 
         yield return null;
@@ -456,67 +454,67 @@ public class Unit : MonoBehaviour {
     }
     private void checkLevel(int newlevel)
     {
-        if (Myelement!=Element.Normal)
+        if (myElement!=Element.Normal)
         switch (newlevel)
         {
-            case (1): MaxHp = 140; CurHp = 140; ATP = 35; Def = 10; Speed = 5; Attackspeed = 0f; Range = 1; Attackspeed = 1.5f - (Attackspeed * 0.12f); return;
-            case (2): MaxHp = 160; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 40; Def = 20; Attackspeed = 1f; Range = 1; Attackspeed = 1.5f - (Attackspeed * 0.12f); return;
+            case (1): maxHp = 140; curHp = 140; atp = 35; def = 10; speed = 5; attackSpeed = 0f; range = 1; attackSpeed = 1.5f - (attackSpeed * 0.12f); return;
+            case (2): maxHp = 160; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 40; def = 20; attackSpeed = 1f; range = 1; attackSpeed = 1.5f - (attackSpeed * 0.12f); return;
               default: break;
         }
-        switch (Myelement)
+        switch (myElement)
         {
             case (Element.Fire): switch (newlevel)
                 {
-                    case (3): MaxHp = 160; CurHp = (CurHp > MaxHp) ? MaxHp:CurHp ; ATP = 60; Def = 20; Speed = 5f; Attackspeed = 0f; break;
-                    case (4): MaxHp = 170; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 70; Def = 25; Speed = 6f; Attackspeed = 2f; break;
-                    case (5): MaxHp = 180; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 80; Def = 30; Speed = 7f; Attackspeed =4f; break;
+                    case (3): maxHp = 160; curHp = (curHp > maxHp) ? maxHp:curHp ; atp = 60; def = 20; speed = 5f; attackSpeed = 0f; break;
+                    case (4): maxHp = 170; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 70; def = 25; speed = 6f; attackSpeed = 2f; break;
+                    case (5): maxHp = 180; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 80; def = 30; speed = 7f; attackSpeed =4f; break;
                 }break;
             case (Element.Soil): switch (newlevel)
                 {
-                    case (3): MaxHp = 160; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 40; Def = 30; Speed = 3f; Attackspeed = 0f; break;
-                    case (4): MaxHp = 200; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 50; Def = 35; Speed = 4f; Attackspeed = 0f; break;
-                    case (5): MaxHp = 240; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 60; Def = 40; Speed = 5f; Attackspeed = 1f; break;
+                    case (3): maxHp = 160; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 40; def = 30; speed = 3f; attackSpeed = 0f; break;
+                    case (4): maxHp = 200; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 50; def = 35; speed = 4f; attackSpeed = 0f; break;
+                    case (5): maxHp = 240; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 60; def = 40; speed = 5f; attackSpeed = 1f; break;
 
                 } break;
             case (Element.Electric): switch (newlevel)
                 {
-                    case (3): MaxHp = 160; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 40; Def = 20; Speed = 7f; Attackspeed = 0f; break;
-                    case (4): MaxHp = 180; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 45; Def = 25; Speed = 9f; Attackspeed = 1f; break;
-                    case (5): MaxHp = 200; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 50; Def = 30; Speed = 12f; Attackspeed = 2f; break;
+                    case (3): maxHp = 160; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 40; def = 20; speed = 7f; attackSpeed = 0f; break;
+                    case (4): maxHp = 180; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 45; def = 25; speed = 9f; attackSpeed = 1f; break;
+                    case (5): maxHp = 200; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 50; def = 30; speed = 12f; attackSpeed = 2f; break;
      
                 } break;
             case (Element.Grass): switch (newlevel)
                 {         
-                    case (3): MaxHp = 160; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 40; Def = 20; Speed = 5f; Attackspeed = 1f; break;
-                    case (4): MaxHp = 180; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 50; Def = 25; Speed = 6f; Attackspeed = 2f; break;
-                    case (5): MaxHp = 210; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 60; Def = 30; Speed = 7f; Attackspeed = 3f; break;
+                    case (3): maxHp = 160; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 40; def = 20; speed = 5f; attackSpeed = 1f; break;
+                    case (4): maxHp = 180; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 50; def = 25; speed = 6f; attackSpeed = 2f; break;
+                    case (5): maxHp = 210; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 60; def = 30; speed = 7f; attackSpeed = 3f; break;
 
                 }StartCoroutine("GrassHealing"); break;
             case (Element.Water): switch (newlevel)
                 {
-                    case (3): MaxHp = 160; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 50; Def = 20; Speed = 5f; Attackspeed = 0f; Range = 1.5f; break;
-                    case (4): MaxHp = 180; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 60; Def = 25; Speed = 6f; Attackspeed = 1f; Range = 1.5f; break;
-                    case (5): MaxHp = 210; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 70; Def = 30; Speed = 7f; Attackspeed = 2f; Range = 1.5f; break;
+                    case (3): maxHp = 160; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 50; def = 20; speed = 5f; attackSpeed = 0f; range = 1.5f; break;
+                    case (4): maxHp = 180; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 60; def = 25; speed = 6f; attackSpeed = 1f; range = 1.5f; break;
+                    case (5): maxHp = 210; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 70; def = 30; speed = 7f; attackSpeed = 2f; range = 1.5f; break;
      
                 } break;
             case (Element.Normal): switch (newlevel)
                 {
-                    /*Sword*/   case (1): CurHp = MaxHp = 300; ATP = 200; Def = 28; Speed = 4f; Attackspeed = 7f; Range = 1.5f; break;
-                    /*Pike*/    case (2): CurHp = MaxHp = 240; ATP = 180; Def = 34; Speed = 4f; Attackspeed = 5f; Range = 2f; break;
-                    /*Shield*/  case (3): CurHp = MaxHp = 500; ATP = 0;   Def = 70; Speed = 2f; Attackspeed = 0f; Range = 0f; break;
-                    /*Cannon*/  case (4): CurHp = MaxHp = 150;  ATP = 200; Def = 0; Speed = 2f; Attackspeed = -10f; Range = 60f; break;
+                    /*Sword*/   case (1): curHp = maxHp = 300; atp = 200; def = 28; speed = 4f; attackSpeed = 7f; range = 1.5f; break;
+                    /*Pike*/    case (2): curHp = maxHp = 240; atp = 180; def = 34; speed = 4f; attackSpeed = 5f; range = 2f; break;
+                    /*Shield*/  case (3): curHp = maxHp = 500; atp = 0;   def = 70; speed = 2f; attackSpeed = 0f; range = 0f; break;
+                    /*Cannon*/  case (4): curHp = maxHp = 150;  atp = 200; def = 0; speed = 2f; attackSpeed = -10f; range = 60f; break;
                   //////Hero///////
                     /*KingGuard*/
-                    case (5): CurHp = MaxHp = 5000; ATP = 300; Def = 50; Speed = 1f; Attackspeed = 0f; Range = 3f; break;
+                    case (5): curHp = maxHp = 5000; atp = 300; def = 50; speed = 1f; attackSpeed = 0f; range = 3f; break;
         
-                // /*Other*/case (5): MaxHp = 16; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 7; Def = 5; Speed = 6; Attackspeed = 1.4f; Range = 40f; break;
-                   // case (6): MaxHp = 20; CurHp = (CurHp > MaxHp) ? MaxHp : CurHp; ATP = 9; Def = 7; Speed = 7; Attackspeed = 1.3f; Range = 40f; break;
+                // /*Other*/case (5): maxHp = 16; curHp = (curHp > maxHp) ? maxHp : curHp; ATP = 7; Def = 5; Speed = 6; Attackspeed = 1.4f; Range = 40f; break;
+                   // case (6): maxHp = 20; curHp = (curHp > maxHp) ? maxHp : curHp; ATP = 9; Def = 7; Speed = 7; Attackspeed = 1.3f; Range = 40f; break;
      
                
                 }break;
 
 
-        } Attackspeed = 1.5f - (Attackspeed * 0.12f);
+        } attackSpeed = 1.5f - (attackSpeed * 0.12f);
     }
     IEnumerator GrassHealing()
     {
@@ -529,7 +527,7 @@ public class Unit : MonoBehaviour {
                     if (g != this.gameObject && Mathf.Abs(g.transform.position.x - this.transform.position.x) < 2f && g.transform.position.y == this.transform.position.y)
                     {
                         g.GetComponent<Unit>().StartCoroutine("Healing");
-                        g.GetComponent<Unit>().CurHp = (g.GetComponent<Unit>().CurHp < g.GetComponent<Unit>().MaxHp) ? g.GetComponent<Unit>().CurHp + 1 : g.GetComponent<Unit>().CurHp;
+                        g.GetComponent<Unit>().curHp = (g.GetComponent<Unit>().curHp < g.GetComponent<Unit>().maxHp) ? g.GetComponent<Unit>().curHp + 1 : g.GetComponent<Unit>().curHp;
                    
                 
                     }
