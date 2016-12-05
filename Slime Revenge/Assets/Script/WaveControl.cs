@@ -26,12 +26,12 @@ public class WaveControl : MonoBehaviour {
     void Start()
     {
         stage = ParsingData.Instnce.GetStage();
-       
+        float startPos = Ewall.Instance.transform.position.x;
         pause = false;
         HumanDen = GameObject.Find("HumanDen");
-        Len[0] =new Vector2(21f,GameObject.Find("L1").transform.position.y);
-        Len[1] = new Vector2(21f, GameObject.Find("L2").transform.position.y);
-        Len[2] = new Vector2(21f, GameObject.Find("L3").transform.position.y);
+        Len[0] = new Vector2(startPos, GameObject.Find("L1").transform.position.y);
+        Len[1] = new Vector2(startPos, GameObject.Find("L2").transform.position.y);
+        Len[2] = new Vector2(startPos, GameObject.Find("L3").transform.position.y);
        
         StartCoroutine("Waving");
 	}

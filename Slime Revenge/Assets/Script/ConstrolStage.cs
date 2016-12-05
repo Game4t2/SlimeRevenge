@@ -52,7 +52,7 @@ public class ConstrolStage : MonoBehaviour {
         if (!Canvas.activeSelf)
         {
   
-            Cameramove.Instanc.StopMove= false;
+            Cameramove.Instanc.stopMove= false;
             if (Input.GetMouseButtonDown(0))
             {
                 hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1f, 1 << LayerMask.NameToLayer("Button"));
@@ -69,7 +69,7 @@ public class ConstrolStage : MonoBehaviour {
         }   
         else
         {
-            Cameramove.Instanc.StopMove = true;
+            Cameramove.Instanc.stopMove = true;
             if (Input.GetMouseButtonDown(0))
             {
                 clicked = true;

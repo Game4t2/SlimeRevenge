@@ -11,6 +11,10 @@ public class Ewall : MonoBehaviour
     private int stage;
     public Sprite[] sp=new Sprite[2];
     // Use this for initialization
+    void Awake()
+    {
+        wall = this;
+    }
     void Start()
     {
         stage = ParsingData.Instnce.GetStage();

@@ -15,6 +15,7 @@ public class TouchDeploy : MonoBehaviour {
     public List<GameObject>[] DisActives=new List<GameObject>[6];
     public GameObject Wait1;
     public GameObject Wait2;
+    private Cameramove cam;
     public GameObject Wait3;
     private GameObject SliemtyPE;
     private RaycastHit2D hit;
@@ -27,6 +28,7 @@ public class TouchDeploy : MonoBehaviour {
     }
     void Start()
     {
+        cam = Camera.main.GetComponent<Cameramove>();
         ControlOn = true;
         myani = this.transform.GetChild(0).GetComponent<Animator>();
         SlimeDen = GameObject.Find("SlimeDen");
@@ -151,9 +153,9 @@ public class TouchDeploy : MonoBehaviour {
                 hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1f, 1 << LayerMask.NameToLayer("Base"));
                 if (hit.collider != null && hit.transform.name == "Deploy") ///Raycast on layer base name deploy(KIng slime len)
                 {
-                    Camera.main.GetComponent<Cameramove>().MoveNormal = false;
+                   cam.moveNormal = false;
                     clickCata = true;
-                    Camera.main.transform.position = new Vector3(0f, Camera.main.transform.position.y, Camera.main.transform.position.z);
+                    Camera.main.transform.position = new Vector3(cam.minPos, Camera.main.transform.position.y, Camera.main.transform.position.z);
                     // Debug.Log(Input.mousePosition.x + "" + hit.transform.name);
                 }
                 else if (hit.collider != null)///Raycast hit on layer base other (Reroll)
@@ -163,7 +165,7 @@ public class TouchDeploy : MonoBehaviour {
             }
             if (clickCata && Input.GetMouseButtonUp(0))
             {
-                Camera.main.GetComponent<Cameramove>().MoveNormal = true;
+                Camera.main.GetComponent<Cameramove>().moveNormal = true;
                 clickCata = false;
                 hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1f, 1 << LayerMask.NameToLayer("Len"));
                 if (hit.collider != null)

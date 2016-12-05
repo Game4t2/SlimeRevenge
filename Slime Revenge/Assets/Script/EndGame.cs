@@ -26,14 +26,14 @@ public class EndGame : MonoBehaviour {
     }
     public void StopAll()
     {
-        Cameramove.Instanc.StopMove = true;
+        Cameramove.Instanc.stopMove = true;
         TouchDeploy.Instance().ControlOn = false;
         WaveControl.Instance.pause = true;
 
     }
     public void ReRun()
     {
-        Cameramove.Instanc.StopMove = false;
+        Cameramove.Instanc.stopMove = false;
         TouchDeploy.Instance().ControlOn = true;
         WaveControl.Instance.pause = false;
 

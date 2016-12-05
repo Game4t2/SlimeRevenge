@@ -53,10 +53,13 @@
      <Compile Include="Assets\Script\EnemyUnit.cs" />
      <Compile Include="Assets\Script\Ewall.cs" />
      <Compile Include="Assets\Script\FollowMouse.cs" />
+     <Compile Include="Assets\Script\GameDatabase.cs" />
      <Compile Include="Assets\Script\LoadScene.cs" />
      <Compile Include="Assets\Script\ParsingData.cs" />
      <Compile Include="Assets\Script\PauseMene.cs" />
      <Compile Include="Assets\Script\RecievedData.cs" />
+     <Compile Include="Assets\Script\ScriptableObjectScripts\EnemyScriptableObject.cs" />
+     <Compile Include="Assets\Script\ScriptableObjectScripts\SlimeScriptableObject.cs" />
      <Compile Include="Assets\Script\SkillID.cs" />
      <Compile Include="Assets\Script\SkillUse.cs" />
      <Compile Include="Assets\Script\SpeedControl.cs" />
@@ -64,6 +67,7 @@
      <Compile Include="Assets\Script\TearDrop.cs" />
      <Compile Include="Assets\Script\TouchDeploy.cs" />
      <Compile Include="Assets\Script\Unit.cs" />
+     <Compile Include="Assets\Script\Util\Global.cs" />
      <Compile Include="Assets\Script\Wall.cs" />
      <Compile Include="Assets\Script\WaveControl.cs" />
  <Reference Include="UnityEngine.UI">

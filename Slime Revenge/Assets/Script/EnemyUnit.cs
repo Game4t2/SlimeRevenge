@@ -16,7 +16,7 @@ public class EnemyUnit : MonoBehaviour
     public float range;
     public float speed;
     public float attackspeed;
-    public float finalPosition;
+    private float finalPosition;
     public int level;
     private SpriteRenderer sprite;
     private bool fireCurse = false;
@@ -42,14 +42,14 @@ public class EnemyUnit : MonoBehaviour
         fireCurse = false;
         mytype = t;
         // if (Mytype == UnitType.Gunner) Debug.Log("Mygun");
-        finalPosition = -5f;
+        finalPosition = TouchDeploy.Instance().transform.position.x;
         this.level = level;
         myelement = e;
         anim = this.GetComponent<Animator>();
         anim.SetInteger("Level", this.level - 1);
         checkLevel(this.level);
         //    this.GetComponent<BoxCollider2D>().que
-        StartCoroutine("walk");
+        StartCoroutine("Walk");
     }
 
     void Awake()
@@ -388,11 +388,11 @@ public class EnemyUnit : MonoBehaviour
                         yield return null;
                     }
                 }
-                else
+                else if (mytype == UnitType.Cannon)
                 {
                     GameObject Bullet = this.transform.FindChild("Bullet").gameObject;
                     RaycastHit2D[] Hits;
-                    if (this.transform.position.x >= 14f)
+                    if (this.transform.position.x >= (Ewall.Instance.transform.position.x-7f))
                         this.transform.position += Vector3.left * Time.deltaTime * speed;
                     else
                     {
@@ -400,17 +400,17 @@ public class EnemyUnit : MonoBehaviour
                         anim.SetBool("Attack", true);
 
                         Bullet.SetActive(true);
-                        while (Bullet.transform.position.x > -1f)
+                        while (Bullet.transform.position.x > Wall.Instance.transform.position.x+1f)
                         {
                             yield return null;
                             Bullet.transform.position += Vector3.left * 10f * Time.deltaTime;
-                            hit = Physics2D.Raycast(Bullet.transform.position, Vector2.zero, 5f, 1 << LayerMask.NameToLayer("Wall"));
+                            /*hit = Physics2D.Raycast(Bullet.transform.position, Vector2.zero, 5f, 1 << LayerMask.NameToLayer("Wall"));
                             if (hit.collider != null)
                             {
                                 Wall.Instance.HP = (((this.atp / 3) - Wall.Instance.def) <= 0) ? Wall.Instance.HP - 3 : Wall.Instance.HP - ((this.atp / 3) - Wall.Instance.def);
                                 break;
                                 // Destroy(gameObject);
-                            }
+                            }*/
 
                             anim.SetBool("Attack", false);
                             Hits = Physics2D.RaycastAll(Bullet.transform.position, Vector2.zero, 5f, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
