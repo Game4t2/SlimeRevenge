@@ -11,9 +11,8 @@ public class Enemy
 {
     public string displayName;
     public string id;
-    private SpriteRenderer sprite;
+    public GameObject prefab;
     public GameObject blood;
-    public Animator anim;
     public int level;
     public int maxHp;
     public int atp;

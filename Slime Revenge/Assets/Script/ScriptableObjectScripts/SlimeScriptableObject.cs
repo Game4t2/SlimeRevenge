@@ -11,8 +11,7 @@ public class SlimeUnit
 {
     public string displayName;
     public string id;
-    public SpriteRenderer sprite;
-    public Animator anim;
+    public GameObject prefab;
     public GameObject bullet;
     public int level;
     public int maxHp;
