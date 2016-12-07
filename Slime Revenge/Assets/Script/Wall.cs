@@ -4,6 +4,8 @@ using System.Collections;
 public class Wall : MonoBehaviour {
     public static Wall Instance { get { return wall; } }
     private static Wall wall;
+    private Animator anim;
+    private bool downed=false;
     public int HP = 1000;
     public int max_Hp = 1000;
     public int def = 50;
@@ -15,9 +17,18 @@ public class Wall : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (this.HP < 0f)
+        if (this.HP < 0f && !downed)
         {
-            gameObject.SetActive(false);
+            downed = true;
+            StartCoroutine("WallBreak");
         }
 	}
+    IEnumerator WallBreak()
+    {
+        
+        anim.SetBool("Down", true);
+        yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
+        gameObject.SetActive(false);
+
+    }
 }

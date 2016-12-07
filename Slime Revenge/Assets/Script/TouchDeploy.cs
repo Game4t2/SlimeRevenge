@@ -43,7 +43,7 @@ public class TouchDeploy : MonoBehaviour {
         SliemtyPE = GameObject.Find("ElementSlime");
         RandomElement();
 	}
-    private void RandomElement()
+    public void RandomElement()
     {
             int x = Random.Range(1, 6);
             int y = Random.Range(1, 6);
@@ -158,10 +158,7 @@ public class TouchDeploy : MonoBehaviour {
                     Camera.main.transform.position = new Vector3(cam.minPos, Camera.main.transform.position.y, Camera.main.transform.position.z);
                     // Debug.Log(Input.mousePosition.x + "" + hit.transform.name);
                 }
-                else if (hit.collider != null)///Raycast hit on layer base other (Reroll)
-                {
-                    RandomElement();
-                }
+           
             }
             if (clickCata && Input.GetMouseButtonUp(0))
             {

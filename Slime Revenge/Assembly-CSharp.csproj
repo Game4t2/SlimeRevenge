@@ -58,6 +58,7 @@
      <Compile Include="Assets\Script\ParsingData.cs" />
      <Compile Include="Assets\Script\PauseMene.cs" />
      <Compile Include="Assets\Script\RecievedData.cs" />
+     <Compile Include="Assets\Script\Reroll.cs" />
      <Compile Include="Assets\Script\ScriptableObjectScripts\EnemyScriptableObject.cs" />
      <Compile Include="Assets\Script\ScriptableObjectScripts\SlimeScriptableObject.cs" />
      <Compile Include="Assets\Script\SkillID.cs" />
