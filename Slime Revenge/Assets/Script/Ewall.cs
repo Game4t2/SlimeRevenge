@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.Sprites;
 public class Ewall : MonoBehaviour
 {
@@ -8,8 +9,10 @@ public class Ewall : MonoBehaviour
     public int HP = 1000;
     public int max_Hp = 1000;
     public int def = 50;
+    private Animator anim;
+    private bool ended=false;
     private int stage;
-    public Sprite[] sp=new Sprite[2];
+    public List<Sprite> sp;
     // Use this for initialization
     void Awake()
     {
@@ -18,25 +21,37 @@ public class Ewall : MonoBehaviour
     void Start()
     {
         stage = ParsingData.Instnce.GetStage();
+
         int s = stage / 10;
-        if (stage%10==0)
-        this.GetComponent<SpriteRenderer>().sprite = sp[s-1];
-        else
-        {
-            Debug.Log("spriteon");
-            this.GetComponent<SpriteRenderer>().sprite = sp[s];
-        }
-      
+        
+
+        this.transform.GetComponent<SpriteRenderer>().sprite = sp[s];
+        anim = this.GetComponent<Animator>();
+    
+     
+        ended = false;
         wall = this;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (this.HP < 0f)
+          if (this.HP < 0f && !ended)
         {
-            EndGame.Instance.WinEnd();
-            gameObject.SetActive(false);
+            ended = true; StartCoroutine("TotheEnd");
+            
         }
+    }
+
+    IEnumerator TotheEnd()
+    {
+        this.GetComponent<Animator>().enabled = true;
+        
+        anim.SetInteger("Type", stage / 10);
+        anim.SetBool("Down", true);
+        yield return null;
+
+        EndGame.Instance.WinEnd();
+        gameObject.SetActive(false);
     }
 }
