@@ -91,7 +91,7 @@ public class SkillUse : MonoBehaviour {
             Actives.Add(mygameObject);
             mygameObject.transform.position = Position;
             mygameObject.SetActive(true);
-            mygameObject.AddComponent<Unit>().Set(Element.Normal, Type);
+          //  mygameObject.AddComponent<Unit>().Set(Element.Normal, Type);
         
 
     }
@@ -125,7 +125,7 @@ public class SkillUse : MonoBehaviour {
                     Actives.Add(mygameObject);
                     mygameObject.transform.position = new Vector2(deployPoint, GameObject.Find("L" + i.ToString()).transform.position.y);
                     mygameObject.SetActive(true);
-                    mygameObject.GetComponent<Unit>().Set(Element.Normal, Type);
+               //     mygameObject.GetComponent<Unit>().Set(Element.Normal, Type);
                     i++;
                     if (i > EndLen) break;
                 }

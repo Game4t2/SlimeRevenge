@@ -12,6 +12,7 @@ public class Unit : MonoBehaviour {
     public Animator anim;
     private bool bekilled=false;
     private bool ended;
+    public List<SlimeUnit> slimeUnits;
     private bool canonEmpty=true;
     public bool hited=false;
     private GameObject bullet;
@@ -35,36 +36,38 @@ public class Unit : MonoBehaviour {
 
     public Element CheckwhichElement(int x)
     {
-        switch (x)
-        {
-            case (1): return Element.Fire;
-            case (2): return Element.Water;
-            case (3): return Element.Grass;
-            case (4): return Element.Electric;
-            case (5): return Element.Soil;
-            default: return Element.Normal;
-        }
+        return (Element)x;
 
     }
 
-    public void Set(Element e,int level=1)
+    public void Set(SlimeUnit sunit,List<SlimeUnit> slimegroup)
+    {
+        slimeUnits = slimegroup;
+       Set(sunit);
+    //    this.GetComponent<BoxCollider2D>().que
+     
+           }
+    public void Set(SlimeUnit sunit)
     {
         ended = false;
-        if(active==null)
-        active = TouchDeploy.Instance().Actives[(int)e];
+        if (active == null)
+            active = TouchDeploy.Instance().Actives[(int)sunit.element];
 
         if (inActive == null)
-        inActive = TouchDeploy.Instance().DisActives[(int)e];
-       
+            inActive = TouchDeploy.Instance().DisActives[(int)sunit.element];
+
         finalPosition = 60f;
-        this.level = level;
-        myElement = e;
+
+        this.level = sunit.level;
         anim = this.GetComponent<Animator>();
         checkLevel(this.level);
-    //    this.GetComponent<BoxCollider2D>().que
-        StartCoroutine("walk");
-           }
+        //    this.GetComponent<BoxCollider2D>().que
 
+    }
+    public void StartWalk()
+    {
+        StartCoroutine("walk");
+    }
    void Awake()
     {
         sprite = this.GetComponent<SpriteRenderer>();
@@ -454,67 +457,24 @@ public class Unit : MonoBehaviour {
     }
     private void checkLevel(int newlevel)
     {
-        if (myElement!=Element.Normal)
-        switch (newlevel)
-        {
-            case (1): maxHp = 140; curHp = 140; atp = 35; def = 10; speed = 5; attackSpeed = 0f; range = 1; attackSpeed = 1.5f - (attackSpeed * 0.12f); return;
-            case (2): maxHp = 160; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 40; def = 20; attackSpeed = 1f; range = 1; attackSpeed = 1.5f - (attackSpeed * 0.12f); return;
-              default: break;
+        foreach (SlimeUnit slimeUnit in slimeUnits) {
+            if (slimeUnit.level == newlevel)
+            {
+                myElement = slimeUnit.element;
+                maxHp = curHp = slimeUnit.maxHp;
+                atp = slimeUnit.atp;
+                def = slimeUnit.def;
+                speed = slimeUnit.speed;
+                attackSpeed = slimeUnit.attackspeed;
+                range = slimeUnit.range;
+                attackSpeed = 1.5f - (attackSpeed * 0.12f);
+            }
+    
         }
-        switch (myElement)
-        {
-            case (Element.Fire): switch (newlevel)
-                {
-                    case (3): maxHp = 160; curHp = (curHp > maxHp) ? maxHp:curHp ; atp = 60; def = 20; speed = 5f; attackSpeed = 0f; break;
-                    case (4): maxHp = 170; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 70; def = 25; speed = 6f; attackSpeed = 2f; break;
-                    case (5): maxHp = 180; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 80; def = 30; speed = 7f; attackSpeed =4f; break;
-                }break;
-            case (Element.Soil): switch (newlevel)
-                {
-                    case (3): maxHp = 160; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 40; def = 30; speed = 3f; attackSpeed = 0f; break;
-                    case (4): maxHp = 200; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 50; def = 35; speed = 4f; attackSpeed = 0f; break;
-                    case (5): maxHp = 240; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 60; def = 40; speed = 5f; attackSpeed = 1f; break;
-
-                } break;
-            case (Element.Electric): switch (newlevel)
-                {
-                    case (3): maxHp = 160; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 40; def = 20; speed = 7f; attackSpeed = 0f; break;
-                    case (4): maxHp = 180; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 45; def = 25; speed = 9f; attackSpeed = 1f; break;
-                    case (5): maxHp = 200; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 50; def = 30; speed = 12f; attackSpeed = 2f; break;
-     
-                } break;
-            case (Element.Grass): switch (newlevel)
-                {         
-                    case (3): maxHp = 160; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 40; def = 20; speed = 5f; attackSpeed = 1f; break;
-                    case (4): maxHp = 180; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 50; def = 25; speed = 6f; attackSpeed = 2f; break;
-                    case (5): maxHp = 210; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 60; def = 30; speed = 7f; attackSpeed = 3f; break;
-
-                }StartCoroutine("GrassHealing"); break;
-            case (Element.Water): switch (newlevel)
-                {
-                    case (3): maxHp = 160; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 50; def = 20; speed = 5f; attackSpeed = 0f; range = 1.5f; break;
-                    case (4): maxHp = 180; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 60; def = 25; speed = 6f; attackSpeed = 1f; range = 1.5f; break;
-                    case (5): maxHp = 210; curHp = (curHp > maxHp) ? maxHp : curHp; atp = 70; def = 30; speed = 7f; attackSpeed = 2f; range = 1.5f; break;
-     
-                } break;
-            case (Element.Normal): switch (newlevel)
-                {
-                    /*Sword*/   case (1): curHp = maxHp = 300; atp = 200; def = 28; speed = 4f; attackSpeed = 7f; range = 1.5f; break;
-                    /*Pike*/    case (2): curHp = maxHp = 240; atp = 180; def = 34; speed = 4f; attackSpeed = 5f; range = 2f; break;
-                    /*Shield*/  case (3): curHp = maxHp = 500; atp = 0;   def = 70; speed = 2f; attackSpeed = 0f; range = 0f; break;
-                    /*Cannon*/  case (4): curHp = maxHp = 150;  atp = 200; def = 0; speed = 2f; attackSpeed = -10f; range = 60f; break;
-                  //////Hero///////
-                    /*KingGuard*/
-                    case (5): curHp = maxHp = 5000; atp = 300; def = 50; speed = 1f; attackSpeed = 0f; range = 3f; break;
+        if(level>=3&&myElement==Element.Grass)
+        StartCoroutine("GrassHealing");
         
-                // /*Other*/case (5): maxHp = 16; curHp = (curHp > maxHp) ? maxHp : curHp; ATP = 7; Def = 5; Speed = 6; Attackspeed = 1.4f; Range = 40f; break;
-                   // case (6): maxHp = 20; curHp = (curHp > maxHp) ? maxHp : curHp; ATP = 9; Def = 7; Speed = 7; Attackspeed = 1.3f; Range = 40f; break;
-     
-               
-                }break;
-
-
-        } attackSpeed = 1.5f - (attackSpeed * 0.12f);
+        
     }
     IEnumerator GrassHealing()
     {

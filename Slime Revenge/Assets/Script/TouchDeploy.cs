@@ -16,6 +16,7 @@ public class TouchDeploy : MonoBehaviour {
     public GameObject Wait1;
     public GameObject Wait2;
     private Cameramove cam;
+    public SlimeScriptableObject slimeScritableObject;
     public GameObject Wait3;
     private GameObject SliemtyPE;
     private RaycastHit2D hit;
@@ -171,16 +172,9 @@ public class TouchDeploy : MonoBehaviour {
                     {
 
                         Vector2 Position = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, hit.transform.position.y);
-                        Element x;
-                        switch (Pathline[0])
-                        {
-                            case (1): x = Element.Fire; break;
-                            case (2): x = Element.Water; break;
-                            case (3): x = Element.Grass; break;
-                            case (4): x = Element.Electric; break;
-                            case (5): x = Element.Soil; break;
-                            default: x = Element.Normal; break;
-                        }
+                        Element myelement;
+                        myelement=(Element)Pathline[0]; 
+                     
                         int reorder = 0;
                         reorder = Pathline[0];
                         Pathline[0] = Pathline[1];
@@ -194,18 +188,39 @@ public class TouchDeploy : MonoBehaviour {
                         //  Debug.Log(reorder);
                         if (DisActives[reorder].Count < 1)
                         {
-                            mygameobject = Instantiate<GameObject>(SliemtyPE.transform.FindChild(x.ToString()).gameObject);
+                            List<SlimeUnit> slimeGroup=new List<SlimeUnit>();
+                            SlimeUnit sUse=new SlimeUnit();
+                            foreach (SlimeUnit s in slimeScritableObject.list)
+                            {
+                                if (s.element == myelement)
+                                { 
+                                    slimeGroup.Add(s);
+                                    if(s.level==1)sUse=s;
+                                }
+                            }
+                            mygameobject = Instantiate<GameObject>( sUse.gameObject);
                             mygameobject.transform.parent = SlimeDen.transform;
+                            mygameobject.AddComponent<Unit>().Set(sUse, slimeGroup);
+                            mygameobject.layer = LayerMask.NameToLayer(myelement.ToString());
                         }
                         else
                         {
                             mygameobject = DisActives[reorder][0];
                             DisActives[reorder].RemoveAt(0);
+                            foreach (SlimeUnit s in mygameobject.GetComponent<Unit>().slimeUnits)
+                            {
+                                if (s.level==1)
+                                {
+                                    mygameobject.AddComponent<Unit>().Set(s);
+
+                                    mygameobject.layer = LayerMask.NameToLayer(myelement.ToString());
+                                }
+                            }
                         }
                         Actives[reorder].Add(mygameobject);
                         mygameobject.transform.position = Position;
 
-                        StartCoroutine(trowing(mygameobject, x));
+                        StartCoroutine(trowing(mygameobject, myelement));
                         //                    mygameobject.transform.position = this.transform.position;
 
                         //                  mygameobject.SetActive(true);
@@ -271,10 +286,7 @@ public class TouchDeploy : MonoBehaviour {
         para.GetComponent<Animator>().speed = 1f;
         myani.SetBool("Sent", false);
         para.layer = ley;
-       if(para.GetComponent<Unit>()==null)
-        para.AddComponent<Unit>().Set(x);
-       else
-           para.GetComponent<Unit>().Set(x);
+        para.GetComponent<Unit>().StartWalk();
    //    Tui = false;
        // yield return new WaitForSeconds(1f);
        // ontrow = false;
