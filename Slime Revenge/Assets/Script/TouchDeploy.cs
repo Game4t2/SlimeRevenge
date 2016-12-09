@@ -211,7 +211,7 @@ public class TouchDeploy : MonoBehaviour {
                             {
                                 if (s.level==1)
                                 {
-                                    mygameobject.AddComponent<Unit>().Set(s);
+                                    mygameobject.GetComponent<Unit>().Set(s);
 
                                     mygameobject.layer = LayerMask.NameToLayer(myelement.ToString());
                                 }
