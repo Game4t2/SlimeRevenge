@@ -24,7 +24,7 @@ public class EnemyUnit : MonoBehaviour
     private bool electricCurse = false;
     private bool beattack = false;
 
-    public UnitType mytype;
+    public EnemyUnitType mytype;
     public Element myelement;
     //public bool Onstage; use for object pooling **** if have to optimize*****
 
@@ -34,7 +34,7 @@ public class EnemyUnit : MonoBehaviour
         return (Element)x;
     }
 
-    public void Set(Element e, UnitType t, int level)
+    public void Set(Element e, EnemyUnitType t, int level)
     {
         blood = this.transform.FindChild("Canvas").GetChild(0).GetChild(0).gameObject;
         range = 1f;
@@ -215,7 +215,7 @@ public class EnemyUnit : MonoBehaviour
 
 
 
-                if (mytype != UnitType.Mage && mytype != UnitType.Cannon && mytype != UnitType.Gunner)
+                if (mytype != EnemyUnitType.Mage && mytype != EnemyUnitType.Cannon && mytype != EnemyUnitType.Gunner)
                 {
 
                     hit = Physics2D.Raycast(this.transform.position, Vector2.left, range, 1 << LayerMask.NameToLayer("Soil"));
@@ -277,7 +277,7 @@ public class EnemyUnit : MonoBehaviour
 
                     }
                 }
-                else if (mytype == UnitType.Gunner)
+                else if (mytype == EnemyUnitType.Gunner)
                 {
                     GameObject Bullet = this.transform.FindChild("Bullet").gameObject;
                     hit = Physics2D.Raycast(this.transform.position, Vector2.left, 1f, 1 << LayerMask.NameToLayer("Wall"));
@@ -337,7 +337,7 @@ public class EnemyUnit : MonoBehaviour
 
                 }
 
-                else if (mytype == UnitType.Mage)
+                else if (mytype == EnemyUnitType.Mage)
                 {
                     mageFoundSlime = false;
                     hit = Physics2D.Raycast(this.transform.position, Vector2.left, range, 1 << LayerMask.NameToLayer("Wall"));
@@ -388,7 +388,7 @@ public class EnemyUnit : MonoBehaviour
                         yield return null;
                     }
                 }
-                else if (mytype == UnitType.Cannon)
+                else if (mytype == EnemyUnitType.Cannon)
                 {
                     GameObject Bullet = this.transform.FindChild("Bullet").gameObject;
                     RaycastHit2D[] Hits;
@@ -536,12 +536,12 @@ public class EnemyUnit : MonoBehaviour
         }*/
         switch (mytype)
         {
-            case (UnitType.Sword): curHp = maxHp = 360 + WaveControl.Instance.ADDHP; atp = 70 + WaveControl.Instance.ADDamage; def = 10; speed = 5; attackspeed = 4f; range = 1f; break;
-            case (UnitType.Pike): curHp = maxHp = 300 + WaveControl.Instance.ADDHP; atp = 80 + WaveControl.Instance.ADDamage; def = 20; speed = 3; attackspeed = 2.5f; range = 2f; break;
-            case (UnitType.Mualer): curHp = maxHp = 200 + WaveControl.Instance.ADDHP; atp = 100 + WaveControl.Instance.ADDamage; def = 10; speed = 2; attackspeed = 1f; range = 1f; break;
-            case (UnitType.Mage): curHp = maxHp = 160 + WaveControl.Instance.ADDHP; atp = 80 + WaveControl.Instance.ADDamage; def = 10; speed = 2; attackspeed = 2f; range = 1f; break;
-            case (UnitType.Gunner): curHp = maxHp = 500 + WaveControl.Instance.ADDHP; atp = 40 + WaveControl.Instance.ADDamage; def = 20; speed = 1; attackspeed = 1f; range = 60f; break;
-            case (UnitType.Cannon): curHp = maxHp = 100 + WaveControl.Instance.ADDHP; atp = 150 + WaveControl.Instance.ADDamage; def = 0; speed = 3; attackspeed = -20f; range = 60f; break;
+            case (EnemyUnitType.Sword): curHp = maxHp = 360 + WaveControl.Instance.ADDHP; atp = 70 + WaveControl.Instance.ADDamage; def = 10; speed = 5; attackspeed = 4f; range = 1f; break;
+            case (EnemyUnitType.Pike): curHp = maxHp = 300 + WaveControl.Instance.ADDHP; atp = 80 + WaveControl.Instance.ADDamage; def = 20; speed = 3; attackspeed = 2.5f; range = 2f; break;
+            case (EnemyUnitType.Mualer): curHp = maxHp = 200 + WaveControl.Instance.ADDHP; atp = 100 + WaveControl.Instance.ADDamage; def = 10; speed = 2; attackspeed = 1f; range = 1f; break;
+            case (EnemyUnitType.Mage): curHp = maxHp = 160 + WaveControl.Instance.ADDHP; atp = 80 + WaveControl.Instance.ADDamage; def = 10; speed = 2; attackspeed = 2f; range = 1f; break;
+            case (EnemyUnitType.Gunner): curHp = maxHp = 500 + WaveControl.Instance.ADDHP; atp = 40 + WaveControl.Instance.ADDamage; def = 20; speed = 1; attackspeed = 1f; range = 60f; break;
+            case (EnemyUnitType.Cannon): curHp = maxHp = 100 + WaveControl.Instance.ADDHP; atp = 150 + WaveControl.Instance.ADDamage; def = 0; speed = 3; attackspeed = -20f; range = 60f; break;
 
         }
         attackspeed = 1.5f - (attackspeed * 0.12f);

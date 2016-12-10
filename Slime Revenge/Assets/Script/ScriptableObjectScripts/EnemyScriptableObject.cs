@@ -22,7 +22,7 @@ public class Enemy
     public float speed;
     private bool fireCurse = false;
     private bool electricCurse = false;
-    public UnitType type;
+    public EnemyUnitType type;
     public Element element;
 
 }
