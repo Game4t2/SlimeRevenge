@@ -51,12 +51,17 @@
      <Compile Include="Assets\Script\ConstrolStage.cs" />
      <Compile Include="Assets\Script\EndGame.cs" />
      <Compile Include="Assets\Script\EnemyUnit.cs" />
+     <Compile Include="Assets\Script\EnemyWave.cs" />
      <Compile Include="Assets\Script\Ewall.cs" />
      <Compile Include="Assets\Script\FollowMouse.cs" />
      <Compile Include="Assets\Script\GameDatabase.cs" />
      <Compile Include="Assets\Script\LoadScene.cs" />
+     <Compile Include="Assets\Script\Minigame\Draging.cs" />
+     <Compile Include="Assets\Script\Minigame\Rolling.cs" />
+     <Compile Include="Assets\Script\Minigame\Taping.cs" />
      <Compile Include="Assets\Script\ParsingData.cs" />
      <Compile Include="Assets\Script\PauseMene.cs" />
+     <Compile Include="Assets\Script\Plugin\MiniJSON.cs" />
      <Compile Include="Assets\Script\RecievedData.cs" />
      <Compile Include="Assets\Script\Reroll.cs" />
      <Compile Include="Assets\Script\ScriptableObjectScripts\EnemyScriptableObject.cs" />
@@ -66,6 +71,7 @@
      <Compile Include="Assets\Script\SpeedControl.cs" />
      <Compile Include="Assets\Script\Stage.cs" />
      <Compile Include="Assets\Script\TearDrop.cs" />
+     <Compile Include="Assets\Script\TiTleScirp\ControlMenu.cs" />
      <Compile Include="Assets\Script\TouchDeploy.cs" />
      <Compile Include="Assets\Script\Unit.cs" />
      <Compile Include="Assets\Script\Util\Global.cs" />
