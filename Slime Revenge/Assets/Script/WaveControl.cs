@@ -26,7 +26,7 @@ public class WaveControl : MonoBehaviour {
     void Start()
     {
         stage = ParsingData.Instnce.GetStage();
-        float startPos = Ewall.Instance.transform.position.x;
+        float startPos = StageController.Instance.enemyWall.transform.position.x;
         pause = false;
         HumanDen = GameObject.Find("HumanDen");
         Len[0] = new Vector2(startPos, GameObject.Find("L1").transform.position.y);
@@ -83,13 +83,13 @@ public class WaveControl : MonoBehaviour {
                 Human.SetActive(true);
                 switch (ranType)
                 {
-                    case (0): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnitType.Sword, 1); break;
+                  /*  case (0): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnitType.Sword, 1); break;
                     case (1): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnitType.Pike, 1); break;
                     case (2): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnitType.Mualer, 1); break;
                     case (3): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnitType.Gunner, 1);  break;
                     case (4): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnitType.Mage, 1); break;
                     case (5): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnitType.Cannon, 1); canon[rancout] = true; break;
-                       
+                       */
                   //  default: Human.AddComponent<EnemyUnit>().Set(Element.Normal, UnitType.Sword, 1); break;
                 }
 

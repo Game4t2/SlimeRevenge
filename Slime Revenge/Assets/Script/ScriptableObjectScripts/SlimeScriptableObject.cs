@@ -15,6 +15,17 @@ public class SlimeScriptableObject : ScriptableObject
         }
         return null;
     }
+
+    public SlimeUnit FindSlimeByName(string name)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (name.Equals(list[i].displayName))
+                return list[i];
+        }
+        Debug.LogError("Can't find slime with name \"" + name + "\" in Database");
+        return null;
+    }
 }
 
 [System.Serializable]
@@ -43,7 +54,7 @@ public class SlimeUnit
         slimeUnit.attackSpeed = attackspeed;
         slimeUnit.range = range;
         slimeUnit.speed = speed;
-        slimeUnit.myElement = element;
+        slimeUnit.element = element;
         return go;
     }
 

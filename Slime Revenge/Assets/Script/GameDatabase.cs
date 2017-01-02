@@ -1,25 +1,39 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public static class GameDatabase
+public class GameDatabase : MonoBehaviour
 {
-    private static SlimeScriptableObject m_slimeDatabase;
-    public static SlimeScriptableObject SlimeDatabase
+    private static GameDatabase _instance;
+    public static GameDatabase Instance
+    {
+        get
+        {
+            if (_instance == null)
+                _instance = FindObjectOfType<GameDatabase>();
+            return _instance;
+        }
+
+    }
+
+    [SerializeField]
+    private SlimeScriptableObject m_slimeDatabase;
+    public SlimeScriptableObject SlimeDatabase
     {
         get
         {
             if (m_slimeDatabase == null)
-                m_slimeDatabase = Resources.Load("/ScriptableObject/SlimeScriptableObject") as SlimeScriptableObject;
+                m_slimeDatabase = new SlimeScriptableObject();
             return m_slimeDatabase;
         }
     }
-    private static EnemyScriptableObject m_enemyDatabase;
-    public static EnemyScriptableObject EnemyDatabase
+    [SerializeField]
+    private EnemyScriptableObject m_enemyDatabase;
+    public EnemyScriptableObject EnemyDatabase
     {
         get
         {
             if (m_enemyDatabase == null)
-                m_enemyDatabase = Resources.Load("/ScriptableObject/EnemyScriptableObject")as EnemyScriptableObject;
+                m_enemyDatabase = new EnemyScriptableObject();
                 return m_enemyDatabase;
         }
     }

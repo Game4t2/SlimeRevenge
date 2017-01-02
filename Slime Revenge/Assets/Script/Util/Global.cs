@@ -7,7 +7,7 @@ public static class Global
     public static string EnemyWavePath(string name = "")
     {
         string path = "";
-       // path = System.IO.Path.Combine(AssetDatabase.GetAssetPath(), "Resources/Stages");
+        // path = System.IO.Path.Combine(AssetDatabase.GetAssetPath(), "Resources/Stages");
         if (!System.IO.Directory.Exists(path))
         {
             System.IO.Directory.CreateDirectory(path);
@@ -15,6 +15,75 @@ public static class Global
         path = System.IO.Path.Combine(path, name);
         return path;
     }
+
+    public static WinLose ElementalWeakness(Element baseElem, Element otherElement)
+    {
+        if (baseElem == Element.Fire)
+        {
+            switch (otherElement)
+            {
+                case (Element.Water):
+                case (Element.Soil): return WinLose.lose;
+                case (Element.Grass):
+                case (Element.Electric): return WinLose.win;
+                default: return WinLose.equal;
+            }
+        }
+
+        else if (baseElem == Element.Electric)
+        {
+            switch (otherElement)
+            {
+                case (Element.Fire):
+                case (Element.Soil): return WinLose.lose;
+                case (Element.Water):
+                case (Element.Grass): return WinLose.win;
+                default: return WinLose.equal;
+            }
+
+        }
+        else if (baseElem == Element.Grass)
+        {
+            switch (otherElement)
+            {
+                case (Element.Fire):
+                case (Element.Electric): return WinLose.lose;
+                case (Element.Water):
+                case (Element.Soil): return WinLose.win;
+                default: return WinLose.equal;
+            }
+
+        }
+        else if (baseElem == Element.Soil)
+        {
+            switch (otherElement)
+            {
+                case (Element.Water):
+                case (Element.Grass): return WinLose.lose;
+                case (Element.Fire):
+                case (Element.Electric): return WinLose.win;
+                default: return WinLose.equal;
+            }
+
+        }
+        else if (baseElem == Element.Water)
+        {
+            switch (otherElement)
+            {
+                case (Element.Grass):
+                case (Element.Electric): return WinLose.lose;
+                case (Element.Fire):
+                case (Element.Soil): return WinLose.win;
+                default: return WinLose.equal;
+            }
+
+        }
+        else
+            return WinLose.equal;
+
+    }
+
+
 
 }
 

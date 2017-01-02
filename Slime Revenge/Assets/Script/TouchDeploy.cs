@@ -198,7 +198,7 @@ public class TouchDeploy : MonoBehaviour {
                                     if(s.level==1)sUse=s;
                                 }
                             }
-                            mygameobject = GameDatabase.SlimeDatabase.GetSlimeData(myelement,1).CreateInstance();
+                            mygameobject = GameDatabase.Instance.SlimeDatabase.GetSlimeData(myelement,1).CreateInstance();
                             mygameobject.transform.parent = SlimeDen.transform;
                             mygameobject.AddComponent<Unit>().Set(sUse, slimeGroup);
                             mygameobject.layer = LayerMask.NameToLayer(myelement.ToString());
