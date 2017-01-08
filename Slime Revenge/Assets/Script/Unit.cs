@@ -69,10 +69,6 @@ public class Unit : MonoBehaviour
         sprite = this.GetComponent<SpriteRenderer>();
 
     }
-    void start()
-    {
-
-    }
     public void End()
     {
         if (!ended)
@@ -123,7 +119,7 @@ public class Unit : MonoBehaviour
         if (!beattack)
         {
             beattack = true;
-            StartCoroutine("BeAttacked");
+            StartCoroutine("AnimationAttacked");
         }
         int Damage = attack;
         if (enemyWinLose == WinLose.win) { Damage *= 2; }
@@ -157,7 +153,7 @@ public class Unit : MonoBehaviour
 
         hited = false;
     }
-    IEnumerator BeAttacked()
+    IEnumerator AnimationAttacked()
     {
         for (int i = 0; i < 5; i++)
         {
@@ -186,8 +182,6 @@ public class Unit : MonoBehaviour
                     touse = x;
                     return true;
                     //     Debug.Log("INCheck2");
-
-
                 }
             }
 
@@ -196,10 +190,47 @@ public class Unit : MonoBehaviour
         return false;
 
     }
-    IEnumerator walk()
+    public void EatToEvol(Unit Unitanother)
     {
-        RaycastHit2D Hit = new RaycastHit2D();
-        bool Found = false;
+        this.level = (Unitanother.level > this.level) ? Unitanother.level + 1 : this.level + 1;
+        this.level = (this.level >= 5) ? 5 : this.level;
+        this.curHp = Unitanother.curHp + this.curHp;
+        checkLevel(level);
+        if (this.level >= 3)
+        {
+            anim.SetInteger("State", 2);
+
+        }
+
+        this.transform.position = Unitanother.transform.position;
+
+        Unitanother.End();
+
+    }
+    public void Attack(RaycastHit2D hit)
+    {
+
+        if (this.gameObject == null) return;
+        else if (hit.transform.gameObject != null)
+        {
+            EnemyUnit Human = hit.transform.gameObject.GetComponent<EnemyUnit>();
+            if (Human.transform.gameObject != null)
+                Human.Attacked(this);
+        }
+    }
+    public void Attack(RaycastHit2D hit,bool foundenemy)
+    {
+        if (hit.transform.gameObject != null)
+        {
+            Attack(hit);
+            foundenemy = true;
+        }
+    }
+
+ IEnumerator walk()
+    {
+        RaycastHit2D hit = new RaycastHit2D();
+        bool found = false;
         GameObject another;
         while (this.transform.position.x < finalPosition)
         {
@@ -207,164 +238,54 @@ public class Unit : MonoBehaviour
             //EatAnother
             if (CheckSameElement(out another))
             {
-                bool desDW = false;//destroy during walk to
-                while (true)
+                while (true)///walkTotarget
                 {
                     if (another.gameObject.activeSelf != false)
                     {
                         this.transform.position = Vector3.MoveTowards(this.transform.position, another.transform.position, this.speed * 3f * Time.deltaTime);
                         yield return null;
-                        if (another.gameObject.activeSelf == false)
-                        {
-                            desDW = true; break;
-                        }
 
-                        else if (this.transform.position.x > another.transform.position.x - 0.2f) break;
-                    }
-                    else { desDW = true; break; }
-
-                }
-                if (!desDW)
-                {
-                    Unit Unitanother = another.GetComponent<Unit>();
-                    this.level = (Unitanother.level > this.level) ? Unitanother.level + 1 : this.level + 1;
-                    this.level = (this.level >= 5) ? 5 : this.level;
-                    this.curHp = Unitanother.curHp + this.curHp;
-                    checkLevel(level);
-                    if (this.level >= 3)
-                    {
-                        anim.SetInteger("State", 2);
-
+                        if (this.transform.position.x > another.transform.position.x - 0.2f) break;
                     }
 
-                    this.transform.position = Unitanother.transform.position;
-
-                    Unitanother.End();
                 }
+                EatToEvol(another.GetComponent<Unit>());
             }
             /////
 
             /////Check Attacked Enemy
-            if (!(this.element == Element.Normal && level >= 4))/// CheckEnemy (checkthis is maleenunit(Element+MaleeType))
+            if (this.element != Element.Normal)/// CheckEnemy (checkthis is maleenunit(Element+MaleeType))
             {
-                Hit = Physics2D.Raycast(this.transform.position, Vector2.right, range, 1 << LayerMask.NameToLayer("EUnit"));
-                if (Hit.collider != null)
+                hit = Physics2D.Raycast(this.transform.position, Vector2.right, range, 1 << LayerMask.NameToLayer("EUnit"));
+                if (hit.collider != null)
                 {
 
                     anim.SetBool("Attack", true);
-                    if (this.gameObject == null) break;
-                    else if (Hit.transform.gameObject != null)
-                    {
-                        EnemyUnit Human = Hit.transform.gameObject.GetComponent<EnemyUnit>();
-                        if (Human.transform.gameObject != null)
-                            Human.Attacked(this);
-                    }
+                    Attack(hit);
                     yield return new WaitForSeconds(attackSpeed);
                     anim.SetBool("Attack", false);
                 }
 
                 else { this.transform.position += Vector3.right * Time.deltaTime * speed; }
             }
-
-            else if (element == Element.Normal && level == 4)////Attack of canon
-            {
-                bullet = this.transform.GetChild(0).transform.gameObject;
-                if (canonEmpty)
-                {
-                    Hit = Physics2D.Raycast(this.transform.position, Vector2.left, 1f, 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Soil"));
-                    if (Hit.collider != null)
-                    {
-                        bullet.transform.position = this.transform.position;
-                        another = Hit.transform.gameObject;
-                        bullet.GetComponent<SpriteRenderer>().sprite = bullet.GetComponent<Bullet>().Getsprite(another.GetComponent<Unit>().element);
-
-                        bullet.SetActive(true);
-
-
-                        another.GetComponent<Unit>().End();
-                        canonEmpty = false;
-
-                    }
-                    else if (this.transform.position.x < 3f)
-                    {
-                        this.transform.position += Vector3.right * Time.deltaTime * speed;
-                    }
-                }
-                if (!canonEmpty)
-                {
-                    Hit = Physics2D.Raycast(this.transform.position, Vector2.right, range, 1 << LayerMask.NameToLayer("EUnit"));
-                    if (Hit.collider != null)
-                    {
-                        Vector3 Position = Hit.transform.position;
-
-                        anim.SetBool("Attack", true);
-                        yield return new WaitForSeconds(0.1f);
-                        anim.SetBool("Attack", false);
-
-                        while (bullet.transform.position.x < Position.x)
-                        {
-
-                            bullet.transform.position += Vector3.right * (Time.deltaTime * 10f);
-                            yield return null;
-                        }
-                        bullet.GetComponent<Animator>().SetInteger("Element", bullet.GetComponent<Bullet>().elementvalue);
-
-
-                        RaycastHit2D[] Hits = Physics2D.RaycastAll(Position - new Vector3(1f, 0f, 0f), Vector2.right, 6f, 1 << LayerMask.NameToLayer("EUnit"));
-                        //  Debug.Log(Position - new Vector3(1f, 0f, 0f) + "to" + Position + new Vector3(5f, 0f, 0f));
-                        foreach (RaycastHit2D hit in Hits)
-                        {
-                            if (hit.collider != null)
-                            {
-                                if (hit.transform.gameObject != null)
-                                {
-                                    EnemyUnit Human = hit.transform.gameObject.GetComponent<EnemyUnit>();
-                                    if (Human.transform.gameObject != null)
-                                        Human.Attacked(this);
-                                    Debug.Log(Human.name);
-                                }
-                            }
-                        }//Debug.Log(Bullet.GetComponent<Animator>().playbackTime);
-
-                        yield return new WaitForSeconds(bullet.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length); bullet.SetActive(false);
-                        bullet.SetActive(false); bullet.GetComponent<Animator>().SetInteger("Element", 7);
-                        // yield return new WaitForSeconds(Attackspeed);
-
-                        canonEmpty = true;
-                    }
-                    else if (this.transform.position.x < 3f)
-                    {
-                        this.transform.position += Vector3.right * Time.deltaTime * speed;
-                    }
-                }
-            }
-
-
+            
             else if (element == Element.Normal && level == 5)////Attack of KingGuard
             {
-                Found = false;
+                found = false;
                 for (int i = 0; i < 3; i++)
                 {
-                    RaycastHit2D[] Hits = Physics2D.RaycastAll(new Vector2(this.transform.position.x, GameObject.Find("Len").transform.GetChild(i).transform.position.y), Vector2.right, range, 1 << LayerMask.NameToLayer("EUnit"));
-                    if (Hits.Length < 1) continue;
-                    this.gameObject.transform.GetChild(0).gameObject.SetActive(true);
-                    foreach (RaycastHit2D hit in Hits)
+                    RaycastHit2D[] hits = Physics2D.RaycastAll(new Vector2(this.transform.position.x, GameObject.Find("Len").transform.GetChild(i).transform.position.y), Vector2.right, range, 1 << LayerMask.NameToLayer("EUnit"));
+                    if (hits.Length < 1) continue;
+                    this.gameObject.transform.GetChild(0).gameObject.SetActive(true);///effectof KING on
+                    foreach (RaycastHit2D inhit in hits)
                     {
                         anim.SetBool("Attack", true);
-                        if (hit.collider != null)
-                        {
-                            Found = true;
-                            if (hit.transform.gameObject != null)
-                            {
-                                EnemyUnit Human = hit.transform.gameObject.GetComponent<EnemyUnit>();
-                                if (Human.transform.gameObject != null)
-                                    Human.Attacked(this);
-                            }
-                        }
-
+                        if (!found)
+                             Attack(inhit, found);
+                        else Attack(inhit);
                     }
                 }
-                if (!Found)
+                if (!found)//walk
                 {
                     this.transform.position += Vector3.right * Time.deltaTime * speed;
                 }
@@ -378,8 +299,8 @@ public class Unit : MonoBehaviour
             }
 
 
-            Hit = Physics2D.Raycast(this.transform.position, Vector2.right, 1f, 1 << LayerMask.NameToLayer("Ewall"));
-            if (Hit.collider != null)
+            hit = Physics2D.Raycast(this.transform.position, Vector2.right, 1f, 1 << LayerMask.NameToLayer("Ewall"));
+            if (hit.collider != null)
             {
                 StageController.Instance.slimeWall.hp = (StageController.Instance.slimeWall.def >= this.atp) ? StageController.Instance.slimeWall.hp - 1 : StageController.Instance.slimeWall.hp - (this.atp - StageController.Instance.slimeWall.def);
                 End();
@@ -426,7 +347,7 @@ public class Unit : MonoBehaviour
                 {
                     if (g != this.gameObject && Mathf.Abs(g.transform.position.x - this.transform.position.x) < 2f && g.transform.position.y == this.transform.position.y)
                     {
-                        g.GetComponent<Unit>().StartCoroutine("Healing");
+                        g.GetComponent<Unit>().StartCoroutine("AnimationHealing");
                         g.GetComponent<Unit>().curHp = (g.GetComponent<Unit>().curHp < g.GetComponent<Unit>().maxHp) ? g.GetComponent<Unit>().curHp + 1 : g.GetComponent<Unit>().curHp;
 
 
@@ -438,7 +359,7 @@ public class Unit : MonoBehaviour
             yield return new WaitForSeconds(3f);
         }
     }
-    IEnumerator Healing()
+    IEnumerator AnimationHealing()
     {
         StopCoroutine("BeAttacked");
         beattack = false;
