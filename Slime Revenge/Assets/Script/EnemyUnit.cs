@@ -6,7 +6,7 @@ public class EnemyUnit : MonoBehaviour
     // public Vector3 MyPosition;
     //   public GameObject MyGameObject;
     public Animator anim;
-
+    
     private bool die = false;
     public int maxHp;
     public int curHp;
@@ -109,10 +109,122 @@ public class EnemyUnit : MonoBehaviour
         }
 
     }
+  
+    public int CheckHitType(out RaycastHit2D hit)
+    {
+        Vector2 directionRay = Vector2.left;
+        Vector2 source = this.transform.position;
+        if (type == EnemyUnitType.Gunner)
+        {
+            directionRay = Vector2.down;
+            source = this.transform.FindChild("Bullet").gameObject.transform.position;
+
+        }
+        
+        hit = Physics2D.Raycast(source, directionRay, range, 1 << LayerMask.NameToLayer("Soil"));
+        if (hit.collider != null)
+        {
+            return 1;///hit soid
+        }
+        else
+        {
+            hit = Physics2D.Raycast(source, directionRay, range, 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
+            if (hit.collider != null)
+            {
+                if (type == EnemyUnitType.Pike || type == EnemyUnitType.Mualer || type == EnemyUnitType.Sword && hit.transform.gameObject.layer == LayerMask.NameToLayer("Electric"))
+                {
+                    StartCoroutine("Shock");
+                }
+                return 2;///hit normal slime
+            }
+            else
+            {
+                Physics2D.Raycast(source, directionRay, range, 1 << LayerMask.NameToLayer("Wall"));
+                if (hit.collider != null)
+                {
+                    return 3;///hit normal wall
+                }
+            }
+        }
+        return 0;
+    }
+    public bool Aim()
+    {
+        return Aim(this.transform.position);
+    }
+    public bool Aim(Vector2 source)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(source, Vector2.left, range, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
+
+        if (hit.collider != null)
+        {
+            return true;
+        }
+        return false;
+     }
+  
+    public void Attack(RaycastHit2D hit,bool cannonshot=false)
+    {
+        if (hit.transform.gameObject.layer != LayerMask.NameToLayer("Wall"))
+        {
+            if (this.gameObject == null) return;
+            else if (hit.transform.gameObject != null)
+            {
+                Unit target = hit.transform.gameObject.GetComponent<Unit>();
+                target.Attacked(atp, Global.ElementalWeakness(target.element, element), cannonshot);
+            }
+        }
+        else
+        {
+
+            StageController.Instance.slimeWall.hp = ((atp / 3 - StageController.Instance.slimeWall.def) <= 0) ? StageController.Instance.slimeWall.hp - 1 : StageController.Instance.slimeWall.hp - (atp / 3 - StageController.Instance.slimeWall.def);
+            if (Mathf.Abs( hit.transform.position.x-this.transform.position.x)<1f)
+            {
+                Destroy(gameObject);
+
+            }
+        }
+    }
+
+    public bool Attack()
+    {
+        RaycastHit2D hit = new RaycastHit2D();
+
+        int hittype = CheckHitType(out hit); ////0=not hit;1=hit soid ;2=hit other slime ;3=hit wall 
+        if (hittype > 0)
+        {
+            if (hittype <= 2)
+            {
+                
+                    anim.SetBool("Attack", true);
+                    if (this.gameObject == null) return false;
+                    else if (hit.transform.gameObject != null)
+                    {
+                        Unit target = hit.transform.gameObject.GetComponent<Unit>();
+                        target.Attacked(atp, Global.ElementalWeakness(target.element, element));
+                    }return true;
+            }
+            else
+            {
+                anim.SetBool("Attack", true);
+
+                StageController.Instance.slimeWall.hp = ((atp / 3 - StageController.Instance.slimeWall.def) <= 0) ? StageController.Instance.slimeWall.hp - 1 : StageController.Instance.slimeWall.hp - (atp / 3 - StageController.Instance.slimeWall.def);
+                if (type != EnemyUnitType.Gunner)
+                {
+                    Destroy(gameObject);
+
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    public void multipleAttack() { }
+    
 
     IEnumerator Walk()
     {
-        RaycastHit2D Hit = new RaycastHit2D();
+        RaycastHit2D hit = new RaycastHit2D();
         Unit target = null;
         bool mageFoundSlime = false;
         while (this.transform.position.x > finalPosition && !die)
@@ -121,169 +233,61 @@ public class EnemyUnit : MonoBehaviour
             if (!electricCurse)
             {
 
-
-
-                if (type != EnemyUnitType.Mage && type != EnemyUnitType.Cannon && type != EnemyUnitType.Gunner)
+               if (type == EnemyUnitType.Gunner)
                 {
-
-                    Hit = Physics2D.Raycast(this.transform.position, Vector2.left, range, 1 << LayerMask.NameToLayer("Soil"));
-                    if (Hit.collider != null)
+                    if (Aim())
                     {
-                        anim.SetBool("Attack", true);
-                        if (this.gameObject == null) break;
-                        else if (Hit.transform.gameObject != null)
-                        {
-                            target = Hit.transform.gameObject.GetComponent<Unit>();
-                            target.Attacked(atp, Global.ElementalWeakness(target.element, element));
-
-                        }
-                        yield return new WaitForSeconds(attackspeed);
-
-                    }
-                    else
-                    {
-                        Hit = Physics2D.Raycast(this.transform.position, Vector2.left, range, 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
-                        if (Hit.collider != null)
-                        {
-                            anim.SetBool("Attack", true);
-                            if (this.gameObject == null) break;
-                            else if (Hit.transform.gameObject != null)
-                            {
-                                target = Hit.transform.gameObject.GetComponent<Unit>();
-                                target.Attacked(atp, Global.ElementalWeakness(target.element, element));
-                                if (target.element == Element.Electric && target.level >= 3)
-                                {
-                                    if (!electricCurse) { electricCurse = true; StartCoroutine("Shock"); }
-                                    continue;
-                                }
-                            }
-                            yield return new WaitForSeconds(attackspeed);
-                        }
-                        else
-                        {
-
-
-                            Hit = Physics2D.Raycast(this.transform.position, Vector2.left, range, 1 << LayerMask.NameToLayer("Wall"));
-                            if (Hit.collider != null)
-                            {
-
-                                anim.SetBool("Attack", true);
-
-                                StageController.Instance.slimeWall.hp = ((atp / 3 - StageController.Instance.slimeWall.def) <= 0) ? StageController.Instance.slimeWall.hp - 1 : StageController.Instance.slimeWall.hp - (atp / 3 - StageController.Instance.slimeWall.def);
-
-                                Destroy(gameObject);
-
-                                yield return new WaitForSeconds(attackspeed);
-                            }
-                            else
-                            {
-                                if (this.gameObject == null) break;
-                                this.transform.position += Vector3.left * Time.deltaTime * speed;
-
-                            }
-                        }
-
-                    }
-                }
-                else if (type == EnemyUnitType.Gunner)
-                {
-                    GameObject Bullet = this.transform.FindChild("Bullet").gameObject;
-                    Hit = Physics2D.Raycast(this.transform.position, Vector2.left, 1f, 1 << LayerMask.NameToLayer("Wall"));
-                    if (Hit.collider != null)
-                    {
-
+                        GameObject bullet= this.transform.FindChild("Bullet").gameObject;
+                        bullet.transform.position = this.transform.position;
                         anim.SetBool("Attack", true);
 
-                        StageController.Instance.slimeWall.hp = ((atp / 3 - StageController.Instance.slimeWall.def) <= 0) ? StageController.Instance.slimeWall.hp - 1 : StageController.Instance.slimeWall.hp - (atp / 3 - StageController.Instance.slimeWall.def);
+                        bullet.SetActive(true);
 
-                        Destroy(gameObject);
-
-                        //   yield return new WaitForSeconds(Attackspeed);
-                    }
-
-                    Hit = Physics2D.Raycast(this.transform.position, Vector2.left, range, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
-
-                    if (Hit.collider != null)
-                    {
-                        Bullet.transform.position = this.transform.position;
-                        anim.SetBool("Attack", true);
-
-                        Bullet.SetActive(true);
-
-                        while (Bullet.transform.position.x > -1f)
+                        while (bullet.transform.position.x > -1f)
                         {
                             yield return null;
-                            Bullet.transform.position += Vector3.left * 10f * Time.deltaTime;
+                            bullet.transform.position += Vector3.left * 10f * Time.deltaTime;
 
-                            anim.SetBool("Attack", false);
-                            Hit = Physics2D.Raycast(Bullet.transform.position, Vector2.zero, 5f, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
-
-                            //  Debug.DrawRay(new Vector3(this.transform.position.x - 1f, this.transform.position.y - 3f, this.transform.position.z), Vector2.up * 6f, Color.yellow, 5f);
-                            if (this.gameObject == null) break;
-                            if (Hit.collider != null)
-                            {
-                                target = Hit.transform.gameObject.GetComponent<Unit>();
-                                Bullet.SetActive(false);
-
-                                target.Attacked(atp, Global.ElementalWeakness(target.element, element));
-                                break;
-
-
-                            }
+                            Attack();
                         }
-                        Bullet.SetActive(false);
+                        bullet.SetActive(false);
                         yield return new WaitForSeconds(attackspeed);
-
-
                         if (this.gameObject == null) break;
                     }
                     else
                     {
                         this.transform.position += Vector3.left * Time.deltaTime * speed;
                     }
-
-
                 }
 
                 else if (type == EnemyUnitType.Mage)
                 {
                     mageFoundSlime = false;
-                    Hit = Physics2D.Raycast(this.transform.position, Vector2.left, range, 1 << LayerMask.NameToLayer("Wall"));
-                    if (Hit.collider != null)
-                    {
-                        anim.SetBool("Attack", true);
-                        StageController.Instance.slimeWall.hp = ((atp * 3 - StageController.Instance.slimeWall.def) <= 0) ? StageController.Instance.slimeWall.hp - 3 : StageController.Instance.slimeWall.hp - (atp * 3 - StageController.Instance.slimeWall.def);
-                        Destroy(gameObject);
-                    }
-                    Hit = Physics2D.Raycast(this.transform.position, Vector2.left, 1f, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
-                    if (Hit.collider != null)
-                    {
 
-                        anim.SetBool("Attack", true);
-                        this.gameObject.transform.FindChild("Power").gameObject.SetActive(true);
-                        mageFoundSlime = true;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        if (Aim(new Vector2(this.transform.position.x, GameObject.Find("Len").transform.GetChild(i).transform.position.y)))
+                        {
+
+                            anim.SetBool("Attack", true);
+                            this.gameObject.transform.FindChild("Power").gameObject.SetActive(true);
+                            mageFoundSlime = true;
+                            break;
+                        }
                     }
                     if (mageFoundSlime)
                     {
-                        RaycastHit2D[] Hits = Physics2D.RaycastAll(new Vector2(this.transform.position.x - 1f, this.transform.position.y - 3f), Vector2.up, 6f, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
+                        RaycastHit2D[] hits = Physics2D.RaycastAll(new Vector2(this.transform.position.x - 1f, this.transform.position.y - 3f), Vector2.up, 6f, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Wall") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
 
-                        for (int i = 0; i < Hits.Length; i++)
+                        foreach(RaycastHit2D inhits in hits)
                         {
-                            Debug.DrawRay(new Vector3(this.transform.position.x - 1f, this.transform.position.y - 3f, this.transform.position.z), Vector2.up * 6f, Color.yellow, 5f);
-                            if (this.gameObject == null) break;
-                            if (Hits[i].collider != null)
-                            {
-                                mageFoundSlime = true;
-                                target = Hits[i].transform.gameObject.GetComponent<Unit>();
-                                target.Attacked(atp, Global.ElementalWeakness(target.element, element));
-
-                            }
+                            if(inhits.collider!=null)
+                            Attack(inhits);
                         }
 
                         yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
                         anim.SetBool("Attack", false);
                         this.gameObject.transform.FindChild("Power").gameObject.SetActive(false);
-                        Debug.Log("sdasdasd" + anim.GetCurrentAnimatorStateInfo(0).length);
                         yield return new WaitForSeconds(attackspeed - anim.GetCurrentAnimatorStateInfo(0).length);
                         mageFoundSlime = false;
                         if (this.gameObject == null) break;
@@ -296,62 +300,44 @@ public class EnemyUnit : MonoBehaviour
                         yield return null;
                     }
                 }
-                else
+                else if (type == EnemyUnitType.Cannon)
                 {
-                    GameObject Bullet = this.transform.FindChild("Bullet").gameObject;
-                    RaycastHit2D[] Hits;
+                    GameObject bullet = this.transform.FindChild("Bullet").gameObject;
+                    RaycastHit2D[] hits;
                     if (this.transform.position.x >= 14f)
                         this.transform.position += Vector3.left * Time.deltaTime * speed;
                     else
                     {
-                        Bullet.transform.position = this.transform.position;
+                        bullet.transform.position = this.transform.position;
                         anim.SetBool("Attack", true);
 
-                        Bullet.SetActive(true);
-                        while (Bullet.transform.position.x > -1f)
+                        bullet.SetActive(true);
+                        while (bullet.transform.position.x > -1f)
                         {
                             yield return null;
-                            Bullet.transform.position += Vector3.left * 10f * Time.deltaTime;
-                            Hit = Physics2D.Raycast(Bullet.transform.position, Vector2.zero, 5f, 1 << LayerMask.NameToLayer("Wall"));
-                            if (Hit.collider != null)
+                            bullet.transform.position += Vector3.left * 10f * Time.deltaTime;
+                            hits = Physics2D.RaycastAll(bullet.transform.position, Vector2.zero, 5f, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Wall") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
+                            foreach (RaycastHit2D inhits in hits)
                             {
-                                StageController.Instance.slimeWall.hp = (((atp / 3) - StageController.Instance.slimeWall.def) <= 0) ? StageController.Instance.slimeWall.hp - 3 : StageController.Instance.slimeWall.hp - ((atp / 3) - StageController.Instance.slimeWall.def);
-                                break;
-                                // Destroy(gameObject);
-                            }
-
-                            anim.SetBool("Attack", false);
-                            Hits = Physics2D.RaycastAll(Bullet.transform.position, Vector2.zero, 5f, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
-
-                            for (int i = 0; i < Hits.Length; i++)
-                            {
-                                //  Debug.DrawRay(new Vector3(this.transform.position.x - 1f, this.transform.position.y - 3f, this.transform.position.z), Vector2.up * 6f, Color.yellow, 5f);
-                                if (this.gameObject == null) break;
-                                if (Hits[i].collider != null)
-                                {
-                                    target = Hits[i].transform.gameObject.GetComponent<Unit>();
-
-                                    if (!target.hited)
-                                    {
-                                        target.Attacked(atp, Global.ElementalWeakness(target.element, element), true);
-                                        if (target.element == Element.Normal && target.level == 3)
-                                        {
-                                            Bullet.SetActive(false);
-                                            break;
-                                        }
-                                    }
-                                }
-
+                                if (inhits.collider != null)
+                                    Attack(inhits,true);
                             }
                         }
-                        Bullet.SetActive(false);
+                        bullet.SetActive(false);
                         yield return new WaitForSeconds(attackspeed);
 
 
                         if (this.gameObject == null) break;
                     }
-
-
+                }
+                else
+                {
+                    if (Attack()) yield return new WaitForSeconds(attackspeed);
+                    else
+                    {
+                        if (this.gameObject == null) break;
+                        this.transform.position += Vector3.left * Time.deltaTime * speed;
+                    }
                 }
             }
 
@@ -396,6 +382,7 @@ public class EnemyUnit : MonoBehaviour
     }
     IEnumerator Shock()
     {
+        electricCurse = true;
         int i = 0;
         while (i < 20)
         {
