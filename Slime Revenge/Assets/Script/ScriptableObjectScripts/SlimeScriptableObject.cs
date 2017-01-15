@@ -4,6 +4,7 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "SlimeScriptableObject", menuName = "Unit/Slime", order = 1)]
 public class SlimeScriptableObject : ScriptableObject
 {
+    public GameObject baseSlimePrefab;
     public List<SlimeUnit> list;
 
     public SlimeUnit GetSlimeData(Element elem, int level, SlimeUnitType type = SlimeUnitType.NONE)
@@ -44,10 +45,8 @@ public class SlimeUnit
     public Element element;
     public SlimeUnitType type;
 
-    public GameObject CreateInstance()
+    public Unit CreateInstance(Unit slimeUnit)
     {
-        GameObject go = GameObject.Instantiate(prefab);
-        Unit slimeUnit = go.AddComponent<Unit>();
         slimeUnit.maxHp = maxHp;
         slimeUnit.atp = atp;
         slimeUnit.def = def;
@@ -55,7 +54,21 @@ public class SlimeUnit
         slimeUnit.range = range;
         slimeUnit.speed = speed;
         slimeUnit.element = element;
-        return go;
+        Animator anim = slimeUnit.GetComponent<Animator>();
+        if (anim == null)
+            anim = slimeUnit.gameObject.AddComponent<Animator>();
+        anim.runtimeAnimatorController = prefab.GetComponent<Animator>().runtimeAnimatorController;
+        anim.SetInteger("Level", level - 1);
+        SpriteRenderer spr = slimeUnit.GetComponent<SpriteRenderer>();
+        if (spr == null)
+            spr = slimeUnit.gameObject.AddComponent<SpriteRenderer>();
+        spr.sprite = prefab.GetComponent<SpriteRenderer>().sprite;
+        BoxCollider2D col = slimeUnit.GetComponent<BoxCollider2D>();
+        if (col == null)
+            col = slimeUnit.gameObject.AddComponent<BoxCollider2D>();
+        col.size = prefab.GetComponent<BoxCollider2D>().size;
+        slimeUnit.gameObject.name = "Slime_" + element.ToString() + "_" + level;
+        return slimeUnit;
     }
 
 }

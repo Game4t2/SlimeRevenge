@@ -81,7 +81,7 @@ public class WaveControl : MonoBehaviour {
                 Human.transform.position = Len[rancout];
                
                 Human.SetActive(true);
-                switch (ranType)
+                /*switch (ranType)
                 {
                   /*  case (0): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnitType.Sword, 1); break;
                     case (1): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnitType.Pike, 1); break;
@@ -89,10 +89,10 @@ public class WaveControl : MonoBehaviour {
                     case (3): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnitType.Gunner, 1);  break;
                     case (4): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnitType.Mage, 1); break;
                     case (5): Human.AddComponent<EnemyUnit>().Set(Element.Normal, EnemyUnitType.Cannon, 1); canon[rancout] = true; break;
-                       */
+                       
                   //  default: Human.AddComponent<EnemyUnit>().Set(Element.Normal, UnitType.Sword, 1); break;
                 }
-
+            */
 
            
             }

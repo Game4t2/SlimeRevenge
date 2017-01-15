@@ -11,7 +11,7 @@ public class Unit : MonoBehaviour
     // public Vector3 MyPosition;
     // public GameObject MyGameObject;
     public Animator anim;
-    private bool killed = false;
+    private bool bekilled = false;
     private bool ended;
     public List<SlimeUnit> slimeUnits;
     private bool canonEmpty = true;
@@ -21,7 +21,7 @@ public class Unit : MonoBehaviour
     private SpriteRenderer sprite;
     public List<GameObject> inActive;
     public int maxHp;
-    public int currentHp;
+    public int curHp;
     public int def;
     public int atp;
     public float range;
@@ -34,6 +34,32 @@ public class Unit : MonoBehaviour
 
     public Element element;
 
+
+
+    public void Set(SlimeUnit sunit, List<SlimeUnit> slimegroup)
+    {
+        slimeUnits = slimegroup;
+        Set(sunit);
+        //    this.GetComponent<BoxCollider2D>().que
+
+    }
+    public void Set(SlimeUnit sunit)
+    {
+        ended = false;
+        /*if (active == null)
+            active = TouchDeploy.Instance().Actives[(int)sunit.element];
+
+        if (inActive == null)
+            inActive = TouchDeploy.Instance().DisActives[(int)sunit.element];
+            */
+        finalPosition = 60f;
+
+        this.level = sunit.level;
+        anim = this.GetComponent<Animator>();
+        checkLevel(this.level);
+        //    this.GetComponent<BoxCollider2D>().que
+
+    }
     public void StartWalk()
     {
         StartCoroutine("walk");
@@ -41,19 +67,8 @@ public class Unit : MonoBehaviour
     void Awake()
     {
         sprite = this.GetComponent<SpriteRenderer>();
-        anim = GetComponent<Animator>();
 
     }
-    void start()
-    {
-
-    }
-
-    private void OnEnable()
-    {
-        currentHp = maxHp;
-    }
-
     public void End()
     {
         if (!ended)
@@ -77,7 +92,7 @@ public class Unit : MonoBehaviour
 
         anim.SetBool("Attack", false);
         anim.SetBool("Death", true);
-        if (killed)
+        if (bekilled)
             yield return new WaitForSeconds(0.7f);
         else yield return null;
         //   this.gameObject.layer = i;
@@ -89,9 +104,9 @@ public class Unit : MonoBehaviour
         anim.SetBool("Death", false);
         anim.SetBool("Attack", false);
         gameObject.SetActive(false); anim.SetInteger("State", 0);
-        if (killed)
+        if (bekilled)
             ChargeBar.Instance.Increseing();
-        killed = false;
+        bekilled = false;
 
     }
 
@@ -111,15 +126,15 @@ public class Unit : MonoBehaviour
         else if ((enemyWinLose == WinLose.lose)) { Damage = Damage / 2; }
 
         Damage = Damage < def ? 0 : Damage - def;
-        this.currentHp = this.currentHp - Damage;
-        if (currentHp <= 0)
+        this.curHp = this.curHp - Damage;
+        if (curHp <= 0)
         {
             ///Ver Optimize by using Object pooling
             /// 
             /// enable = false;
             /// 
             /// Ver Not Optimize using Destroy
-            killed = true;
+            bekilled = true;
             End();
 
             //   gameObject.SetActive(false);
@@ -175,12 +190,11 @@ public class Unit : MonoBehaviour
         return false;
 
     }
-
-    public void EatToEvol(Unit otherUnit)
+    public void EatToEvol(Unit Unitanother)
     {
-        this.level = (otherUnit.level > this.level) ? otherUnit.level + 1 : this.level + 1;
+        this.level = (Unitanother.level > this.level) ? Unitanother.level + 1 : this.level + 1;
         this.level = (this.level >= 5) ? 5 : this.level;
-        this.currentHp = otherUnit.currentHp + this.currentHp;
+        this.curHp = Unitanother.curHp + this.curHp;
         checkLevel(level);
         if (this.level >= 3)
         {
@@ -188,9 +202,9 @@ public class Unit : MonoBehaviour
 
         }
 
-        this.transform.position = otherUnit.transform.position;
+        this.transform.position = Unitanother.transform.position;
 
-        otherUnit.End();
+        Unitanother.End();
 
     }
     public void Attack(RaycastHit2D hit)
@@ -224,37 +238,17 @@ public class Unit : MonoBehaviour
             //EatAnother
             if (CheckSameElement(out another))
             {
-                /* while (true)///walkTotarget
-                 {
-                     if (another.gameObject.activeSelf != false)
-                     {
-                         this.transform.position = Vector3.MoveTowards(this.transform.position, another.transform.position, this.speed * 3f * Time.deltaTime);
-                         yield return null;
-                         if (another.gameObject.activeSelf == false)
-                         {
-                             desDW = true; break;
-                         }
+                while (true)///walkTotarget
+                {
+                    if (another.gameObject.activeSelf != false)
+                    {
+                        this.transform.position = Vector3.MoveTowards(this.transform.position, another.transform.position, this.speed * 3f * Time.deltaTime);
+                        yield return null;
 
-                         else if (this.transform.position.x > another.transform.position.x - 0.2f) break;
-                     }
-                     else { desDW = true; break; }
+                        if (this.transform.position.x > another.transform.position.x - 0.2f) break;
+                    }
 
-                 }
-                 if (!desDW)
-                 {
-                     Unit Unitanother = another.GetComponent<Unit>();
-                     this.level = (Unitanother.level > this.level) ? Unitanother.level + 1 : this.level + 1;
-                     this.level = (this.level >= 5) ? 5 : this.level;
-                     this.currentHp = Unitanother.currentHp + this.currentHp;
-                     checkLevel(level);
-                     if (this.level >= 3)
-                     {
-                         anim.SetInteger("State", 2);
-
-                         if (this.transform.position.x > another.transform.position.x - 0.2f) break;
-                     }
-
-                 }*/
+                }
                 EatToEvol(another.GetComponent<Unit>());
             }
             /////
@@ -328,7 +322,7 @@ public class Unit : MonoBehaviour
             if (slimeUnit.level == newlevel)
             {
                 element = slimeUnit.element;
-                maxHp = currentHp = slimeUnit.maxHp;
+                maxHp = curHp = slimeUnit.maxHp;
                 atp = slimeUnit.atp;
                 def = slimeUnit.def;
                 speed = slimeUnit.speed;
@@ -345,18 +339,15 @@ public class Unit : MonoBehaviour
     }
     IEnumerator GrassHealing()
     {
-        float radius = 2f;
         while (true)
         {
             /*
-            foreach (List<GameObject> li in TouchDeploy.Instance.GetPool())
+            foreach (List<GameObject> li in TouchDeploy.Instance().Actives)
             {
                 foreach (GameObject g in li)
                 {
                     if (g != this.gameObject && Mathf.Abs(g.transform.position.x - this.transform.position.x) < 2f && g.transform.position.y == this.transform.position.y)
                     {
-                        g.GetComponent<Unit>().StartCoroutine("Healing");
-                        g.GetComponent<Unit>().currentHp = (g.GetComponent<Unit>().currentHp < g.GetComponent<Unit>().maxHp) ? g.GetComponent<Unit>().currentHp + 1 : g.GetComponent<Unit>().currentHp;
                         g.GetComponent<Unit>().StartCoroutine("AnimationHealing");
                         g.GetComponent<Unit>().curHp = (g.GetComponent<Unit>().curHp < g.GetComponent<Unit>().maxHp) ? g.GetComponent<Unit>().curHp + 1 : g.GetComponent<Unit>().curHp;
 
@@ -364,17 +355,8 @@ public class Unit : MonoBehaviour
                     }
                 }
             }
+            
             */
-            Collider2D[] cols = Physics2D.OverlapCircleAll(transform.position, radius);
-            for (int i = 0; i < cols.Length; i++)
-            {
-                if (cols[i].gameObject != this.gameObject)
-                {
-                    Unit unit = cols[i].GetComponent<Unit>();
-                    unit.StartCoroutine("Healing");
-                    unit.currentHp = (unit.currentHp < unit.maxHp) ? unit.currentHp + 1 : unit.currentHp;
-                }
-            }
             yield return new WaitForSeconds(3f);
         }
     }
@@ -389,6 +371,7 @@ public class Unit : MonoBehaviour
 
 
     }
+    // Update is called once per frame
 
 
 

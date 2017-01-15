@@ -1,18 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EndGame : MonoBehaviour {
+public class EndGame : MonoBehaviour
+{
     public static EndGame Instance { get { return Ins; } }
-     private static EndGame Ins;
-	// Use this for initialization
-	void Start () {
+    private static EndGame Ins;
+    // Use this for initialization
+    void Start()
+    {
         Ins = this;
-	}
+    }
     public void LoseEnd()
     {
         StopAll();
         this.transform.FindChild("YourLose").gameObject.SetActive(true);
-        
+
         Time.timeScale = 0f;
 
     }
@@ -27,19 +29,20 @@ public class EndGame : MonoBehaviour {
     public void StopAll()
     {
         Cameramove.Instanc.stopMove = true;
-        TouchDeploy.Instance().ControlOn = false;
+        TouchDeploy.Instance.controlOn = false;
         WaveControl.Instance.pause = true;
 
     }
     public void ReRun()
     {
         Cameramove.Instanc.stopMove = false;
-        TouchDeploy.Instance().ControlOn = true;
+        TouchDeploy.Instance.controlOn = true;
         WaveControl.Instance.pause = false;
 
     }
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
 }

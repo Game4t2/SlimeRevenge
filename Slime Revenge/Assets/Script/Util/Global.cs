@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System;
 using System.Collections;
 
 public static class Global
@@ -83,7 +84,12 @@ public static class Global
 
     }
 
-
+    public static Element GetRandomElement()
+    {
+        Array e = Enum.GetValues(typeof(Element));
+        System.Random rand = new System.Random();
+        return (Element)e.GetValue(rand.Next(e.Length));
+    }
 
 }
 

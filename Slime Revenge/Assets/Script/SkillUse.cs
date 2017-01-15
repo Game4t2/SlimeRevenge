@@ -2,7 +2,8 @@
 using System.Collections;
 
 using System.Collections.Generic;
-public class SkillUse : MonoBehaviour {
+public class SkillUse : MonoBehaviour
+{
     public static SkillUse Instance { get { return instance; } }
     private static SkillUse instance;
     private RaycastHit2D hit;
@@ -10,92 +11,78 @@ public class SkillUse : MonoBehaviour {
     private GameObject SlimesT;
     private GameObject ClickedButton;
     private int Type;
-   // private float cooldown=3f;
-    
-    public bool HeroOnStage=false;
-    private float deployPoint=-3;
+    // private float cooldown=3f;
+
+    public bool HeroOnStage = false;
+    private float deployPoint = -3;
     private string typename;
-    public List<GameObject> DisActives;
-    public List<GameObject> Actives;
-	// Use this for initialization
-    void Awake() {
+    public List<GameObject> inactive;
+    public List<GameObject> active;
+    // Use this for initialization
+    void Awake()
+    {
         instance = this;
-     
+
     }
-	void Start () {
-        
+    void Start()
+    {
+
         SlimesT = GameObject.Find("SlimeType");
-	}
-	
-	// Update is called once per frame
+    }
+
+    // Update is called once per frame
     void Update()
     {
-        if (ChargeBar.Instance.Isfull()&&!HeroOnStage)
+        if (ChargeBar.Instance.Isfull() && !HeroOnStage)
         {
             HeroOnStage = true;
             ChargeBar.Instance.Reset();
             Type = 5;
-            DeployType(5,2, 2);
+            DeployType(5, 2, 2);
         }
 
-        
-        if (DisActives==null)
-        {
-        
-        DisActives = TouchDeploy.Instance().DisActives[0];
-        Actives = TouchDeploy.Instance().Actives[0];
-    }
-        if (Input.GetMouseButtonDown(0)&&TouchDeploy.Instance().ControlOn&&TearDrop.Instance.teardrop>=5)
-        {
-            /*
-            if (ClickedType)
-            {
-                hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1f, 1 << LayerMask.NameToLayer("Len"));
-                if (hit.collider != null)
-                {
-                  DeployTypeOneLen();
 
-                }
-                else
-                {
-                    ClickedType = false;
-                } ClickedButton.GetComponent<SpriteRenderer>().color = Color.white;
-            }
-                */
+        if (inactive == null)
+        {
+
+            //DisActives = TouchDeploy.Instance().inactive[0];
+            //Actives = TouchDeploy.Instance().active[0];
+        }
+        if (Input.GetMouseButtonDown(0) && TouchDeploy.Instance.controlOn && TearDrop.Instance.teardrop >= 5)
+        {
             hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 1f, 1 << LayerMask.NameToLayer("Button"));
-         //   Debug.Log(DisActives.Count);
-            if (hit.collider != null) 
-        {
-           
-            if (hit.transform.GetComponent<SkillID>().IsType&& !hit.transform.GetComponent<SkillID>().BecoolDown)
+            if (hit.collider != null)
             {
-               TearDrop.Instance.teardrop-=5;
-                Type = hit.transform.GetComponent<SkillID>().ID; 
-                ClickedType = true;
-                hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
-                ClickedButton = hit.transform.gameObject;
-                hit.transform.GetComponent<SkillID>().StartcoolDown();
-                DeployType(Type);
+
+                if (hit.transform.GetComponent<SkillID>().IsType && !hit.transform.GetComponent<SkillID>().BecoolDown)
+                {
+                    TearDrop.Instance.teardrop -= 5;
+                    Type = hit.transform.GetComponent<SkillID>().ID;
+                    ClickedType = true;
+                    hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
+                    ClickedButton = hit.transform.gameObject;
+                    hit.transform.GetComponent<SkillID>().StartcoolDown();
+                    DeployType(Type);
+                }
             }
+
+
+
+
         }
-
-
-
-       
-        }
-	}
+    }
     private void CreateUnit(Vector2 Position)
     {
-        
-            GameObject mygameObject = Instantiate<GameObject>(SlimesT.transform.FindChild(typename).gameObject);
-            Actives.Add(mygameObject);
-            mygameObject.transform.position = Position;
-            mygameObject.SetActive(true);
-          //  mygameObject.AddComponent<Unit>().Set(Element.Normal, Type);
-        
+
+        GameObject mygameObject = Instantiate<GameObject>(SlimesT.transform.FindChild(typename).gameObject);
+        active.Add(mygameObject);
+        mygameObject.transform.position = Position;
+        mygameObject.SetActive(true);
+        //  mygameObject.AddComponent<Unit>().Set(Element.Normal, Type);
+
 
     }
-    private void DeployType(int myType,int startLen=1,int EndLen=3)
+    private void DeployType(int myType, int startLen = 1, int EndLen = 3)
     {
         switch (myType)
         {
@@ -105,38 +92,40 @@ public class SkillUse : MonoBehaviour {
             case (4): typename = "Cannon"; break;
             case (5): typename = "KingGuard"; break;
         }
-        if (DisActives.Count < 1)
+        if (inactive.Count < 1)
         {
             for (int i = startLen; i <= EndLen; i++)
             {
                 CreateUnit(new Vector2(deployPoint, GameObject.Find("L" + i.ToString()).transform.position.y));
 
-            } ClickedType = false;
+            }
+            ClickedType = false;
         }
         else
         {
             int i = startLen; GameObject mygameObject;
-            for (int j = 0; j < DisActives.Count; j++)
+            for (int j = 0; j < inactive.Count; j++)
             {
-                if (DisActives[j].GetComponent<SkillID>().ID == this.Type)
+                if (inactive[j].GetComponent<SkillID>().ID == this.Type)
                 {
-                    mygameObject = DisActives[j];
-                    DisActives.RemoveAt(j);
-                    Actives.Add(mygameObject);
+                    mygameObject = inactive[j];
+                    inactive.RemoveAt(j);
+                    active.Add(mygameObject);
                     mygameObject.transform.position = new Vector2(deployPoint, GameObject.Find("L" + i.ToString()).transform.position.y);
                     mygameObject.SetActive(true);
-               //     mygameObject.GetComponent<Unit>().Set(Element.Normal, Type);
+                    //     mygameObject.GetComponent<Unit>().Set(Element.Normal, Type);
                     i++;
                     if (i > EndLen) break;
                 }
             }
             while (i <= EndLen)
             {
-                
+
                 CreateUnit(new Vector2(deployPoint, GameObject.Find("L" + i.ToString()).transform.position.y));
                 i++;
 
-            } ClickedType = false;
+            }
+            ClickedType = false;
         }
     }
     /*

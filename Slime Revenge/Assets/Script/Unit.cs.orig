@@ -34,6 +34,9 @@ public class Unit : MonoBehaviour
 
     public Element element;
 
+
+
+
     public void StartWalk()
     {
         StartCoroutine("walk");
@@ -176,11 +179,12 @@ public class Unit : MonoBehaviour
 
     }
 
-    public void EatToEvol(Unit otherUnit)
+    IEnumerator walk()
+    public void EatToEvol(Unit Unitanother)
     {
-        this.level = (otherUnit.level > this.level) ? otherUnit.level + 1 : this.level + 1;
+        this.level = (Unitanother.level > this.level) ? Unitanother.level + 1 : this.level + 1;
         this.level = (this.level >= 5) ? 5 : this.level;
-        this.currentHp = otherUnit.currentHp + this.currentHp;
+        this.curHp = Unitanother.curHp + this.curHp;
         checkLevel(level);
         if (this.level >= 3)
         {
@@ -188,9 +192,9 @@ public class Unit : MonoBehaviour
 
         }
 
-        this.transform.position = otherUnit.transform.position;
+        this.transform.position = Unitanother.transform.position;
 
-        otherUnit.End();
+        Unitanother.End();
 
     }
     public void Attack(RaycastHit2D hit)
@@ -204,7 +208,7 @@ public class Unit : MonoBehaviour
                 Human.Attacked(this);
         }
     }
-    public void Attack(RaycastHit2D hit, bool foundenemy)
+    public void Attack(RaycastHit2D hit,bool foundenemy)
     {
         if (hit.transform.gameObject != null)
         {
@@ -213,7 +217,7 @@ public class Unit : MonoBehaviour
         }
     }
 
-    IEnumerator walk()
+ IEnumerator walk()
     {
         RaycastHit2D hit = new RaycastHit2D();
         bool found = false;
@@ -224,37 +228,40 @@ public class Unit : MonoBehaviour
             //EatAnother
             if (CheckSameElement(out another))
             {
-                /* while (true)///walkTotarget
-                 {
-                     if (another.gameObject.activeSelf != false)
-                     {
-                         this.transform.position = Vector3.MoveTowards(this.transform.position, another.transform.position, this.speed * 3f * Time.deltaTime);
-                         yield return null;
-                         if (another.gameObject.activeSelf == false)
-                         {
-                             desDW = true; break;
-                         }
+                while (true)///walkTotarget
+                {
+                    if (another.gameObject.activeSelf != false)
+                    {
+                        this.transform.position = Vector3.MoveTowards(this.transform.position, another.transform.position, this.speed * 3f * Time.deltaTime);
+                        yield return null;
+<<<<<<< HEAD
+                        if (another.gameObject.activeSelf == false)
+                        {
+                            desDW = true; break;
+                        }
 
-                         else if (this.transform.position.x > another.transform.position.x - 0.2f) break;
-                     }
-                     else { desDW = true; break; }
+                        else if (this.transform.position.x > another.transform.position.x - 0.2f) break;
+                    }
+                    else { desDW = true; break; }
 
-                 }
-                 if (!desDW)
-                 {
-                     Unit Unitanother = another.GetComponent<Unit>();
-                     this.level = (Unitanother.level > this.level) ? Unitanother.level + 1 : this.level + 1;
-                     this.level = (this.level >= 5) ? 5 : this.level;
-                     this.currentHp = Unitanother.currentHp + this.currentHp;
-                     checkLevel(level);
-                     if (this.level >= 3)
-                     {
-                         anim.SetInteger("State", 2);
+                }
+                if (!desDW)
+                {
+                    Unit Unitanother = another.GetComponent<Unit>();
+                    this.level = (Unitanother.level > this.level) ? Unitanother.level + 1 : this.level + 1;
+                    this.level = (this.level >= 5) ? 5 : this.level;
+                    this.currentHp = Unitanother.currentHp + this.currentHp;
+                    checkLevel(level);
+                    if (this.level >= 3)
+                    {
+                        anim.SetInteger("State", 2);
+=======
+>>>>>>> 6bf3d9107d6e963fdcfe32d8781b14a0a2b59c02
 
-                         if (this.transform.position.x > another.transform.position.x - 0.2f) break;
-                     }
+                        if (this.transform.position.x > another.transform.position.x - 0.2f) break;
+                    }
 
-                 }*/
+                }
                 EatToEvol(another.GetComponent<Unit>());
             }
             /////
@@ -274,7 +281,7 @@ public class Unit : MonoBehaviour
 
                 else { this.transform.position += Vector3.right * Time.deltaTime * speed; }
             }
-
+            
             else if (element == Element.Normal && level == 5)////Attack of KingGuard
             {
                 found = false;
@@ -287,7 +294,7 @@ public class Unit : MonoBehaviour
                     {
                         anim.SetBool("Attack", true);
                         if (!found)
-                            Attack(inhit, found);
+                             Attack(inhit, found);
                         else Attack(inhit);
                     }
                 }
@@ -355,10 +362,13 @@ public class Unit : MonoBehaviour
                 {
                     if (g != this.gameObject && Mathf.Abs(g.transform.position.x - this.transform.position.x) < 2f && g.transform.position.y == this.transform.position.y)
                     {
+<<<<<<< HEAD
                         g.GetComponent<Unit>().StartCoroutine("Healing");
                         g.GetComponent<Unit>().currentHp = (g.GetComponent<Unit>().currentHp < g.GetComponent<Unit>().maxHp) ? g.GetComponent<Unit>().currentHp + 1 : g.GetComponent<Unit>().currentHp;
+=======
                         g.GetComponent<Unit>().StartCoroutine("AnimationHealing");
                         g.GetComponent<Unit>().curHp = (g.GetComponent<Unit>().curHp < g.GetComponent<Unit>().maxHp) ? g.GetComponent<Unit>().curHp + 1 : g.GetComponent<Unit>().curHp;
+>>>>>>> 6bf3d9107d6e963fdcfe32d8781b14a0a2b59c02
 
 
                     }
@@ -389,6 +399,7 @@ public class Unit : MonoBehaviour
 
 
     }
+    // Update is called once per frame
 
 
 
