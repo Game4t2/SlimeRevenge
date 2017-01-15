@@ -218,13 +218,13 @@ public class Unit : MonoBehaviour
         RaycastHit2D hit = new RaycastHit2D();
         bool found = false;
         GameObject another;
-        while (this.transform.position.x < finalPosition)
+        while (true)
         {
             yield return null;
             //EatAnother
             if (CheckSameElement(out another))
             {
-                /* while (true)///walkTotarget
+                while (true)///walkTotarget
                  {
                      if (another.gameObject.activeSelf != false)
                      {
@@ -232,29 +232,15 @@ public class Unit : MonoBehaviour
                          yield return null;
                          if (another.gameObject.activeSelf == false)
                          {
-                             desDW = true; break;
+                             break;
                          }
 
                          else if (this.transform.position.x > another.transform.position.x - 0.2f) break;
                      }
-                     else { desDW = true; break; }
+                  
 
                  }
-                 if (!desDW)
-                 {
-                     Unit Unitanother = another.GetComponent<Unit>();
-                     this.level = (Unitanother.level > this.level) ? Unitanother.level + 1 : this.level + 1;
-                     this.level = (this.level >= 5) ? 5 : this.level;
-                     this.currentHp = Unitanother.currentHp + this.currentHp;
-                     checkLevel(level);
-                     if (this.level >= 3)
-                     {
-                         anim.SetInteger("State", 2);
-
-                         if (this.transform.position.x > another.transform.position.x - 0.2f) break;
-                     }
-
-                 }*/
+                
                 EatToEvol(another.GetComponent<Unit>());
             }
             /////
