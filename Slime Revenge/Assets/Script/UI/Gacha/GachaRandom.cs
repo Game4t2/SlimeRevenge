@@ -9,15 +9,21 @@ public class GachaRandom : MonoBehaviour {
     public List<GameObject> groupRare;
     public List<GameObject> groupSRare;
     public int salt;
+    private int gachaPieces;
     private GameObject result;
     private Animator slimeHammer;
     private Button onetimebutton;
     private Button tentimebutton;
     private Text saltDisplay;
     private Text tentimeText;
-    
+    private GameObject confirmPanel;
+    private Text confirmPharse;
+  
     // Use this for initialization
     void Start () {
+
+        confirmPanel = this.transform.FindChild("Confirmation").gameObject;
+        confirmPharse = this.transform.FindChild("Confirmation").gameObject.transform.GetChild(1).gameObject.GetComponent<Text>();
         slimeHammer = this.transform.FindChild("SlimeHammer").gameObject.GetComponent<Animator>();
         tentimebutton = this.transform.FindChild("10 time").gameObject.GetComponent<Button>();
         tentimeText = this.transform.FindChild("10 time").GetChild(0).gameObject.GetComponent<Text>();
@@ -26,15 +32,40 @@ public class GachaRandom : MonoBehaviour {
         saltDisplay= this.transform.FindChild("Salt").GetChild(0).gameObject.GetComponent<Text>();
 
     }
-    public void ClickGacha10time()
+    public void SetGacha10time()
     {
         if (!clicked)
         {
             int time = salt / 10;
             if (time > 10) time = 10;
-            ClickGacha(time);
+            gachaPieces = time;
+            confirmPanel.SetActive(true);
+            confirmPharse.text = "Are you sure To spend " + (gachaPieces * 10).ToString() + " salt? \n" + salt.ToString() + " To " + (salt - gachaPieces * 10).ToString();
         }
     }
+    public void SetGacha1Time()
+    {
+        if (!clicked)
+        {
+            gachaPieces = 1;
+            confirmPanel.SetActive(true);
+            confirmPharse.text = "Are you sure To spend " + (gachaPieces * 10).ToString() + " salt? \n" + salt.ToString() + " To " + (salt - gachaPieces * 10).ToString();
+        }
+    }
+
+    public void Comfirm()
+    {
+        confirmPanel.SetActive(false);
+        ClickGacha(gachaPieces);
+    }
+    public void Cancel()
+    {
+        gachaPieces = 0;
+
+        confirmPanel.SetActive(false);
+        clicked = false;
+    }
+
 	public void ClickGacha(int time)
     {
         if (!clicked)
