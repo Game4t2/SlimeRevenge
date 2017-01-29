@@ -5,9 +5,9 @@ public class Wall : MonoBehaviour
 {
     private Animator anim;
     private bool destroyed = false;
-    public int hp = 100;
-    public int max_Hp = 100;
-    public int def = 50;
+    public float hp = 100;
+    public float max_Hp = 100;
+    public float def = 50;
 
     // Use this for initialization
     void Start()
@@ -32,5 +32,12 @@ public class Wall : MonoBehaviour
         yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
         gameObject.SetActive(false);
 
+    }
+
+    public void Attacked(float damageReceive)
+    {
+        float actualDamage = damageReceive / 3 - def;
+        actualDamage = Mathf.Min(1, actualDamage);
+        hp -= actualDamage;
     }
 }

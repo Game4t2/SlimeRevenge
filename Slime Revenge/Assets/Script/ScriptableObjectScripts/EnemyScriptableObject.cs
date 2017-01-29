@@ -4,6 +4,8 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "EnemyScriptableObject", menuName = "Unit/Enemy", order = 2)]
 public class EnemyScriptableObject : ScriptableObject
 {
+    public GameObject baseEnemyPrefab;
+
     public List<Enemy> list;
 
     public Enemy FindEnemyByName(string name)

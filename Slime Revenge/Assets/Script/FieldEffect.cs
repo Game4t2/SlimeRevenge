@@ -8,7 +8,10 @@ public class FieldEffect
     public float duration;
     public string targetUnitType;
     public string targetStatus;
-
+    /// <summary>
+    /// This will represeted as 0-1
+    /// </summary>
+    public float effectPower;
 
     public enum EffectType
     {

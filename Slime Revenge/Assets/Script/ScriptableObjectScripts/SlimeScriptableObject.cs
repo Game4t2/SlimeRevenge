@@ -36,9 +36,9 @@ public class SlimeUnit
     public string id;
     public GameObject prefab;
     public int level;
-    public int maxHp;
-    public int atp;
-    public int def;
+    public float maxHp;
+    public float atp;
+    public float def;
     public float attackspeed;
     public float range;
     public float speed;

@@ -17,17 +17,15 @@ public class Unit : MonoBehaviour
     private bool canonEmpty = true;
     public bool hited = false;
     private GameObject bullet;
-    public List<GameObject> active;
     private SpriteRenderer sprite;
-    public List<GameObject> inActive;
-    public int maxHp;
-    public int currentHp;
-    public int def;
-    public int atp;
+    public float maxHp;
+    public float currentHp;
+    public float def;
+    public float atp;
     public float range;
     public float speed;
     public float attackSpeed;
-    public float finalPosition;
+    private float finalPosition;
     public int level;
     private bool beattack = false;
     // public TouchDeploy Mycontrol;
@@ -84,8 +82,6 @@ public class Unit : MonoBehaviour
         //  Debug.Log(LayerMask.LayerToName(this.gameObject.layer));
         sprite.color = Color.white;
         beattack = false;
-        active.Remove(gameObject);
-        inActive.Add(gameObject);
         anim.SetBool("Death", false);
         anim.SetBool("Attack", false);
         gameObject.SetActive(false); anim.SetInteger("State", 0);
@@ -97,7 +93,7 @@ public class Unit : MonoBehaviour
 
 
 
-    public void Attacked(int attack, WinLose enemyWinLose, bool canonShot = false)
+    public void Attacked(float attack, WinLose enemyWinLose, bool canonShot = false)
     {
         if (canonShot)
             StartCoroutine("BecanonShot");
@@ -106,12 +102,12 @@ public class Unit : MonoBehaviour
             beattack = true;
             StartCoroutine("AnimationAttacked");
         }
-        int Damage = attack;
-        if (enemyWinLose == WinLose.win) { Damage *= 2; }
-        else if ((enemyWinLose == WinLose.lose)) { Damage = Damage / 2; }
+        float damage = attack;
+        if (enemyWinLose == WinLose.win) { damage *= 2; }
+        else if ((enemyWinLose == WinLose.lose)) { damage = damage / 2; }
 
-        Damage = Damage < def ? 0 : Damage - def;
-        this.currentHp = this.currentHp - Damage;
+        damage = damage < def ? 0 : damage - def;
+        this.currentHp = this.currentHp - damage;
         if (currentHp <= 0)
         {
             ///Ver Optimize by using Object pooling
@@ -129,6 +125,22 @@ public class Unit : MonoBehaviour
         }
 
     }
+
+    public float GetTotalAttack()
+    {
+        float totalAttack = atp;
+        List<FieldEffect> list = FieldEffectController.GetSlimeFieldEffect();
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i].targetStatus == "atp" && list[i].effect == FieldEffect.EffectType.Buff)
+                totalAttack = totalAttack + (atp * list[i].effectPower);
+            else if (list[i].targetStatus == "atp" && list[i].effect == FieldEffect.EffectType.Debuff)
+                totalAttack = totalAttack - (atp * list[i].effectPower);
+        }
+        return totalAttack;
+    }
+
+
     IEnumerator BecanonShot()
     {
 
@@ -153,26 +165,23 @@ public class Unit : MonoBehaviour
 
     }
 
-    public bool CheckSameElement(out GameObject touse)
+
+    public Unit GetClosestSameElementSlime()
     {
-        if (this.element == Element.Normal) { touse = null; return false; }
-        foreach (GameObject x in active)
+        if (this.element == Element.Normal)
+            return null;
+        Unit[] sameElemUnits = SlimePool.GetPool().FindAll(unit => unit.element == this.element).ToArray();
+        Unit cloestUnit = null;
+        for (int i = 0; i < sameElemUnits.Length; i++)
         {
-            if (x != this.gameObject)
+            Vector3 direction = (sameElemUnits[i].transform.position - this.transform.position);
+            if (direction.x > 0 && direction.y == 0 && sameElemUnits[i].transform.position.x <= this.transform.position.x + 2.5f)
             {
-                //   Debug.Log("INCheck1");
-
-                if (x.transform.position.x >= this.transform.position.x && x.transform.position.x <= this.transform.position.x + 2.5f && x.transform.position.y == this.transform.position.y)
-                {
-                    touse = x;
-                    return true;
-                    //     Debug.Log("INCheck2");
-                }
+                cloestUnit = sameElemUnits[i];
+                return cloestUnit;
             }
-
         }
-        touse = gameObject;
-        return false;
+        return cloestUnit;
 
     }
 
@@ -193,7 +202,7 @@ public class Unit : MonoBehaviour
         otherUnit.End();
 
     }
-    public void Attack(RaycastHit2D hit)
+    private void Attack(RaycastHit2D hit)
     {
 
         if (this.gameObject == null) return;
@@ -204,44 +213,28 @@ public class Unit : MonoBehaviour
                 Human.Attacked(this);
         }
     }
-    public void Attack(RaycastHit2D hit, bool foundenemy)
-    {
-        if (hit.transform.gameObject != null)
-        {
-            Attack(hit);
-            foundenemy = true;
-        }
-    }
+
 
     IEnumerator walk()
     {
         RaycastHit2D hit = new RaycastHit2D();
         bool found = false;
-        GameObject another;
+        Unit another;
         while (true)
         {
             yield return null;
             //EatAnother
-            if (CheckSameElement(out another))
+            another = GetClosestSameElementSlime();
+            if (another != null)
             {
-                while (true)///walkTotarget
-                 {
-                     if (another.gameObject.activeSelf != false)
-                     {
-                         this.transform.position = Vector3.MoveTowards(this.transform.position, another.transform.position, this.speed * 3f * Time.deltaTime);
-                         yield return null;
-                         if (another.gameObject.activeSelf == false)
-                         {
-                             break;
-                         }
+                while (another.gameObject.activeInHierarchy)///walkTotarget
+                {
+                    this.transform.position = Vector3.MoveTowards(this.transform.position, another.transform.position, this.speed * 3f * Time.deltaTime);
+                    yield return null;
+                    if (this.transform.position.x > another.transform.position.x - 0.2f) break;
+                }
 
-                         else if (this.transform.position.x > another.transform.position.x - 0.2f) break;
-                     }
-                  
-
-                 }
-                
-                EatToEvol(another.GetComponent<Unit>());
+                EatToEvol(another);
             }
             /////
 
@@ -273,7 +266,7 @@ public class Unit : MonoBehaviour
                     {
                         anim.SetBool("Attack", true);
                         if (!found)
-                            Attack(inhit, found);
+                            Attack(inhit);
                         else Attack(inhit);
                     }
                 }
@@ -297,15 +290,9 @@ public class Unit : MonoBehaviour
                 StageController.Instance.slimeWall.hp = (StageController.Instance.slimeWall.def >= this.atp) ? StageController.Instance.slimeWall.hp - 1 : StageController.Instance.slimeWall.hp - (this.atp - StageController.Instance.slimeWall.def);
                 End();
             }
-
+            yield return null;
         }///End While
-         ///Move To Camp of enemy(infont of enemy)
-        this.transform.position = Vector3.MoveTowards(this.transform.position, new Vector2(finalPosition, this.transform.position.y), this.speed * Time.deltaTime);
-        End();
 
-        yield return null;
-        // gameObject.SetActive(false);
-        // Destroy(gameObject);        
     }
     private void checkLevel(int newlevel)
     {

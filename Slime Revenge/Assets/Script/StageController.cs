@@ -84,26 +84,14 @@ public class StageController : MonoBehaviour
             {
                 time = 0;
                 unitCount++;
-                GameObject enemyUnit = GameDatabase.Instance.EnemyDatabase.FindEnemyByName(wave.enemyName).CreateInstance();
-                Vector3 spawnPosition = Vector3.zero;
-                if (m_enemyWall != null)
-                {
-                    int lane = wave.spawnLane;
-                    if (wave.spawnLane < 0)
-                        lane = Random.Range(0, m_Lane.Count - 1);
-                    else if (wave.spawnLane >= m_Lane.Count)
-                        lane = m_Lane.Count - 1;
-
-                    spawnPosition = new Vector3(m_enemyWall.transform.position.x, m_Lane[lane].transform.position.y, 0);
-                }
-                else
-                    Debug.LogError("Enemy wall is missing recheck at " + this.name);
-                enemyUnit.transform.position = spawnPosition;
-                enemyUnit.SetActive(true);
-                m_currentUnitGroup.Add(enemyUnit);
+                GameObject enemy = _SpawnEnemy(GameDatabase.Instance.EnemyDatabase.FindEnemyByName(wave.enemyName), wave.spawnLane);
+                //if wait till wave end, will wait for this to die before start a new one
+                if (wave.waitTillWaveEnd)
+                    m_currentUnitGroup.Add(enemy);
             }
             yield return null;
         }
+        //non group
         if (!wave.groupWithNextWave && wave.waitTillWaveEnd)
         {
             if (wave.waitTillWaveEnd)
@@ -120,16 +108,40 @@ public class StageController : MonoBehaviour
                 yield return null;
             }
         }
-
-
-
-
+        //set null will force _ReadNextWave() to run next one
         currentCoroutine = null;
     }
 
+    private GameObject _SpawnEnemy(Enemy enemy, int lane)
+    {
+        GameObject enemyUnit = enemy.CreateInstance();
+        Vector3 spawnPosition = Vector3.zero;
+        if (m_enemyWall != null)
+        {
+            if (lane < 0)
+                lane = Random.Range(0, m_Lane.Count - 1);
+            else if (lane >= m_Lane.Count)
+                lane = m_Lane.Count - 1;
+
+            spawnPosition = new Vector3(m_enemyWall.transform.position.x, m_Lane[lane].transform.position.y, 0);
+        }
+        else
+            Debug.LogError("Enemy wall is missing recheck at " + this.name);
+        enemyUnit.transform.position = spawnPosition;
+        enemyUnit.SetActive(true);
+        return enemyUnit;
+    }
+
+
+
     private bool _CheckWaveStatus()
     {
-        return false;
+        for (int i = 0; i < m_currentUnitGroup.Count; i++)
+        {
+            if (m_currentUnitGroup[i].activeInHierarchy)
+                return false;
+        }
+        return true;
     }
 
     private void OnGUI()

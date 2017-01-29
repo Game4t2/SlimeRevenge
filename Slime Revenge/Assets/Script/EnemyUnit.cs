@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class EnemyUnit : MonoBehaviour
 {
@@ -8,11 +9,11 @@ public class EnemyUnit : MonoBehaviour
     public Animator anim;
     
     private bool die = false;
-    public int maxHp;
-    public int curHp;
+    public float maxHp;
+    public float curHp;
     public GameObject blood;
-    public int def;
-    public int atp;
+    public float def;
+    public float atp;
     public float range;
     public float speed;
     public float attackspeed;
@@ -42,6 +43,17 @@ public class EnemyUnit : MonoBehaviour
         WalKToTarget();
     }
 
+    //this will be called by pool
+    private void OnEnable()
+    {
+        
+    }
+
+    private void OnDying()
+    {
+        die = true;
+        gameObject.SetActive(false);
+    }
 
     public void WalKToTarget(Transform t = null)
     {
@@ -56,20 +68,35 @@ public class EnemyUnit : MonoBehaviour
         StartCoroutine("Walk");
     }
 
+    public float GetTotalAttack()
+    {
+        float totalAttack = atp;
+        FieldEffect[] list = FieldEffectController.GetEnemyFieldEffect().ToArray();
+        for (int i = 0; i < list.Length; i++)
+        {
+            if (list[i].targetStatus == "atp" && list[i].effect == FieldEffect.EffectType.Buff)
+                totalAttack = totalAttack + (atp * list[i].effectPower);
+            else if (list[i].targetStatus == "atp" && list[i].effect == FieldEffect.EffectType.Debuff)
+                totalAttack = totalAttack - (atp * list[i].effectPower);
+        }
+        return atp;
+    }
+
     public void Attacked(Unit slime)
     {
         if (!die)
         {
             if (!beattack)
                 StartCoroutine("BeAttacked");
-            int Damage = (Global.ElementalWeakness(element, slime.element) == WinLose.win) ? slime.atp / 2 : slime.atp;
-            Damage = (Global.ElementalWeakness(element, slime.element) == WinLose.lose) ? slime.atp * 2 : slime.atp;
+            float damage = slime.GetTotalAttack();
+            if (Global.ElementalWeakness(element, slime.element) == WinLose.lose)
+                damage /= 2;
             if (slime.level > 2)
             {
                 switch (slime.element)
                 {
                     case (Element.Water):
-                        this.curHp = this.curHp - Damage;
+                        this.curHp = this.curHp - damage;
                         if (this.curHp <= 0)
                         {
                             die = true;
@@ -85,14 +112,16 @@ public class EnemyUnit : MonoBehaviour
                         }
                         else
                         {
-                            fireCurse = true; burnlevel = slime.level; StartCoroutine("Burning");
+                            fireCurse = true;
+                            burnlevel = slime.level;
+                            StartCoroutine("Burning");
                         }
                         break;
                     default: break;
                 }
-                this.curHp = this.curHp - ((Damage - this.def < 0) ? 0 : Damage - this.def);
+                this.curHp = this.curHp - ((damage - this.def < 0) ? 0 : damage - this.def);
             }
-            else this.curHp = this.curHp - ((Damage - this.def < 0) ? 0 : Damage - this.def);
+            else this.curHp = this.curHp - ((damage - this.def < 0) ? 0 : damage - this.def);
             if (this.curHp <= 0)
             {
                 die = true;
@@ -171,13 +200,13 @@ public class EnemyUnit : MonoBehaviour
             else if (hit.transform.gameObject != null)
             {
                 Unit target = hit.transform.gameObject.GetComponent<Unit>();
-                target.Attacked(atp, Global.ElementalWeakness(target.element, element), cannonshot);
+                target.Attacked(GetTotalAttack(), Global.ElementalWeakness(target.element, element), cannonshot);
             }
         }
         else
         {
 
-            StageController.Instance.slimeWall.hp = ((atp / 3 - StageController.Instance.slimeWall.def) <= 0) ? StageController.Instance.slimeWall.hp - 1 : StageController.Instance.slimeWall.hp - (atp / 3 - StageController.Instance.slimeWall.def);
+            StageController.Instance.slimeWall.hp = ((GetTotalAttack() / 3 - StageController.Instance.slimeWall.def) <= 0) ? StageController.Instance.slimeWall.hp - 1 : StageController.Instance.slimeWall.hp - (GetTotalAttack() / 3 - StageController.Instance.slimeWall.def);
             if (Mathf.Abs( hit.transform.position.x-this.transform.position.x)<1f)
             {
                 Destroy(gameObject);
@@ -201,14 +230,14 @@ public class EnemyUnit : MonoBehaviour
                     else if (hit.transform.gameObject != null)
                     {
                         Unit target = hit.transform.gameObject.GetComponent<Unit>();
-                        target.Attacked(atp, Global.ElementalWeakness(target.element, element));
+                        target.Attacked(GetTotalAttack(), Global.ElementalWeakness(target.element, element));
                     }return true;
             }
             else
             {
                 anim.SetBool("Attack", true);
 
-                StageController.Instance.slimeWall.hp = ((atp / 3 - StageController.Instance.slimeWall.def) <= 0) ? StageController.Instance.slimeWall.hp - 1 : StageController.Instance.slimeWall.hp - (atp / 3 - StageController.Instance.slimeWall.def);
+                StageController.Instance.slimeWall.Attacked(GetTotalAttack());
                 if (type != EnemyUnitType.Gunner)
                 {
                     Destroy(gameObject);
@@ -362,19 +391,19 @@ public class EnemyUnit : MonoBehaviour
         float tt = anim.GetCurrentAnimatorStateInfo(0).length;
         Debug.Log(tt + "aass");
         yield return new WaitForSeconds(tt + 0.1f);
-        Destroy(gameObject);
+        OnDying();
     }
 
     IEnumerator BeAttacked()
     {
-        Color Mycolor = sprite.color;
+        Color myColor = sprite.color;
         beattack = true;
         for (int i = 0; i < 5; i++)
         {
             sprite.color = Color.red;
             yield return new WaitForSeconds(0.15f);
 
-            sprite.color = Mycolor;
+            sprite.color = myColor;
 
             yield return new WaitForSeconds(0.15f);
         }

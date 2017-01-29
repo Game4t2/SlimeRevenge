@@ -22,8 +22,7 @@ public class TouchDeploy : MonoBehaviour
     [SerializeField]
     private int m_poolSize;
 
-    private static List<GameObject> slimePool = new List<GameObject>();
-    private static int poolSize;
+
 
 
     ///change Input getbutton=>touch 
@@ -31,48 +30,17 @@ public class TouchDeploy : MonoBehaviour
     void Awake()
     {
         Instances = this;
-        poolSize = m_poolSize;
+        SlimePool.InitPool(m_poolSize);
     }
     void Start()
     {
         cam = Camera.main.GetComponent<Cameramove>();
         controlOn = true;
-        //kingAnimator = this.transform.GetChild(0).GetComponent<Animator>();
-        for (int i = 0; i < poolSize; i++)
-        {
-            GameObject go = Instantiate(GameDatabase.Instance.SlimeDatabase.baseSlimePrefab);
-            go.SetActive(false);
-            slimePool.Add(go);
-            /* active[i] = new List<GameObject>();
-             inactive[i] = new List<GameObject>();*/
-        }
         RandomElementInQueue();
     }
 
     public void RandomElementInQueue()
     {
-        /* Element elem1;
-         Element elem2;
-         Element elem3;
-
-         do
-         {
-             elem1 = Global.GetRandomElement();
-         } while (elem1 == Element.Normal);
-
-         do
-         {
-             elem2 = Global.GetRandomElement();
-         } while (elem1 == elem2 || elem2 == Element.Normal);
-
-         do
-         {
-             elem3 = Global.GetRandomElement();
-         } while (elem3 == elem1 || elem3 == elem2 || elem3 == Element.Normal);
-
-         queuedElement[0] = elem1;
-         queuedElement[1] = elem2;
-         queuedElement[2] = elem3;*/
         queuedElement = GetUniqueElements(queuedElement.Length).ToArray();
         _WaitingQueAnimation();
     }
@@ -140,18 +108,18 @@ public class TouchDeploy : MonoBehaviour
                         _ReorderQueue();
 
                         _WaitingQueAnimation();
-                        GameObject newUnit = PoolRequest();
-                        GameDatabase.Instance.SlimeDatabase.GetSlimeData(queuedElement[0], 1).CreateInstance(newUnit.GetComponent<Unit>());
+                        Unit newUnit = SlimePool.PoolRequest();
+                        GameDatabase.Instance.SlimeDatabase.GetSlimeData(queuedElement[0], 1).CreateInstance(newUnit);
                         foreach (SlimeUnit s in newUnit.GetComponent<Unit>().slimeUnits)
                         {
                             if (s.level == 1)
                             {
                                 //newUnit.GetComponent<Unit>().Set(s);
 
-                                newUnit.layer = LayerMask.NameToLayer(myelement.ToString());
+                                newUnit.gameObject.layer = LayerMask.NameToLayer(myelement.ToString());
                             }
                         }
-                        StartCoroutine(Throwing(newUnit, myelement, position));
+                        StartCoroutine(Throwing(newUnit.gameObject, myelement, position));
                     }
                 }
             }
@@ -222,24 +190,4 @@ public class TouchDeploy : MonoBehaviour
     }
 
 
-    #region SlimePool
-    private static GameObject PoolRequest()
-    {
-        for (int i = 0; i < slimePool.Count; i++)
-        {
-            if (!slimePool[i].activeInHierarchy)
-                return slimePool[i];
-        }
-        poolSize++;
-        GameObject newSlime = Instantiate(GameDatabase.Instance.SlimeDatabase.baseSlimePrefab);
-        slimePool.Add(newSlime);
-        return newSlime;
-    }
-
-    public static List<GameObject> GetPool()
-    {
-        return slimePool;
-    }
-
-    #endregion
 }

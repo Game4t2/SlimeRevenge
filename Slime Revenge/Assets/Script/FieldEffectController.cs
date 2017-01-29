@@ -4,9 +4,10 @@ using System.Collections.Generic;
 public class FieldEffectController : MonoBehaviour
 {
     //field effect and its start time
-    private Dictionary<FieldEffect, float> m_slimeFieldEffect;
-    private Dictionary<FieldEffect, float> m_enemyFieldEffect;
-    private float m_time;
+    private static Dictionary<FieldEffect, float> m_slimeFieldEffect;
+    private static Dictionary<FieldEffect, float> m_enemyFieldEffect;
+    private static float m_time;
+
     // Use this for initialization
     void Start()
     {
@@ -20,7 +21,7 @@ public class FieldEffectController : MonoBehaviour
         m_time += Time.deltaTime;
     }
 
-    public List<FieldEffect> GetSlimeFieldEffect()
+    public static List<FieldEffect> GetSlimeFieldEffect()
     {
         List<FieldEffect> fe = new List<FieldEffect>();
         foreach (KeyValuePair<FieldEffect, float> pair in m_slimeFieldEffect)
@@ -39,7 +40,7 @@ public class FieldEffectController : MonoBehaviour
 
     }
 
-    public List<FieldEffect> GetEnemyFieldEffect()
+    public static List<FieldEffect> GetEnemyFieldEffect()
     {
         List<FieldEffect> fe = new List<FieldEffect>();
         foreach (KeyValuePair<FieldEffect, float> pair in m_enemyFieldEffect)
