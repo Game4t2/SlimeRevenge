@@ -12,9 +12,9 @@ public static class EnemyPool
         poolSize = size;
         while (enemyPool.Count < poolSize)
         {
-            GameObject go = GameObject.Instantiate(GameDatabase.Instance.SlimeDatabase.baseSlimePrefab);
+            GameObject go = GameObject.Instantiate(GameDatabase.Instance.EnemyDatabase.baseEnemyPrefab);
             go.SetActive(false);
-            SlimePool.GetPool().Add(go.GetComponent<Unit>());
+            EnemyPool.GetPool().Add(go.GetComponent<EnemyUnit>());
         }
 
     }

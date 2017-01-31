@@ -5,9 +5,9 @@ using System.Collections.Generic;
 public class SlimeScriptableObject : ScriptableObject
 {
     public GameObject baseSlimePrefab;
-    public List<SlimeUnit> list;
+    public List<SlimeData> list;
 
-    public SlimeUnit GetSlimeData(Element elem, int level, SlimeUnitType type = SlimeUnitType.NONE)
+    public SlimeData GetSlimeData(Element elem, int level, SlimeUnitType type = SlimeUnitType.NONE)
     {
         for (int i = 0; i < list.Count; i++)
         {
@@ -17,7 +17,7 @@ public class SlimeScriptableObject : ScriptableObject
         return null;
     }
 
-    public SlimeUnit FindSlimeByName(string name)
+    public SlimeData FindSlimeByName(string name)
     {
         for (int i = 0; i < list.Count; i++)
         {
@@ -30,7 +30,7 @@ public class SlimeScriptableObject : ScriptableObject
 }
 
 [System.Serializable]
-public class SlimeUnit
+public class SlimeData
 {
     public string displayName;
     public string id;
@@ -59,6 +59,8 @@ public class SlimeUnit
             anim = slimeUnit.gameObject.AddComponent<Animator>();
         anim.runtimeAnimatorController = prefab.GetComponent<Animator>().runtimeAnimatorController;
         anim.SetInteger("Level", level - 1);
+        if (level >= 3)
+            anim.SetInteger("State", 2);
         SpriteRenderer spr = slimeUnit.GetComponent<SpriteRenderer>();
         if (spr == null)
             spr = slimeUnit.gameObject.AddComponent<SpriteRenderer>();

@@ -6,9 +6,9 @@ public class EnemyScriptableObject : ScriptableObject
 {
     public GameObject baseEnemyPrefab;
 
-    public List<Enemy> list;
+    public List<EnemyData> list;
 
-    public Enemy FindEnemyByName(string name)
+    public EnemyData FindEnemyByName(string name)
     {
         for (int i = 0; i < list.Count; i++)
         {
@@ -22,7 +22,7 @@ public class EnemyScriptableObject : ScriptableObject
 }
 
 [System.Serializable]
-public class Enemy
+public class EnemyData
 {
     public string displayName;
     public string id;

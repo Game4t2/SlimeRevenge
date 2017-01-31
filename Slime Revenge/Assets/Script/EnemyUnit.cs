@@ -10,7 +10,7 @@ public class EnemyUnit : MonoBehaviour
     
     private bool die = false;
     public float maxHp;
-    public float curHp;
+    public float currentHp;
     public GameObject blood;
     public float def;
     public float atp;
@@ -41,12 +41,24 @@ public class EnemyUnit : MonoBehaviour
         anim = GetComponent<Animator>();
         anim.SetInteger("Level", this.level - 1);
         WalKToTarget();
+        StageController.Instance.onGamePaused += _OnPaused;
+        StageController.Instance.onGameUnpaused += _OnUnpaused;
     }
 
     //this will be called by pool
     private void OnEnable()
     {
-        
+        currentHp = maxHp;
+    }
+
+    private void _OnPaused()
+    {
+        anim.enabled = false;
+    }
+
+    private void _OnUnpaused()
+    {
+        anim.enabled = true;
     }
 
     private void OnDying()
@@ -96,8 +108,8 @@ public class EnemyUnit : MonoBehaviour
                 switch (slime.element)
                 {
                     case (Element.Water):
-                        this.curHp = this.curHp - damage;
-                        if (this.curHp <= 0)
+                        this.currentHp = this.currentHp - damage;
+                        if (this.currentHp <= 0)
                         {
                             die = true;
                             TearDrop.Instance.incresing();
@@ -119,10 +131,10 @@ public class EnemyUnit : MonoBehaviour
                         break;
                     default: break;
                 }
-                this.curHp = this.curHp - ((damage - this.def < 0) ? 0 : damage - this.def);
+                this.currentHp = this.currentHp - ((damage - this.def < 0) ? 0 : damage - this.def);
             }
-            else this.curHp = this.curHp - ((damage - this.def < 0) ? 0 : damage - this.def);
-            if (this.curHp <= 0)
+            else this.currentHp = this.currentHp - ((damage - this.def < 0) ? 0 : damage - this.def);
+            if (this.currentHp <= 0)
             {
                 die = true;
                 TearDrop.Instance.incresing();
@@ -134,7 +146,7 @@ public class EnemyUnit : MonoBehaviour
                 StartCoroutine("Die");
 
             }
-            blood.transform.localPosition = blood.transform.localPosition - new Vector3((this.maxHp - this.curHp) * 2f / this.maxHp, 0f, 0f);
+            blood.transform.localPosition = blood.transform.localPosition - new Vector3((this.maxHp - this.currentHp) * 2f / this.maxHp, 0f, 0f);
         }
 
     }
@@ -429,8 +441,8 @@ public class EnemyUnit : MonoBehaviour
     {
         for (int i = 0; i < 5; i++)
         {
-            this.curHp = this.curHp - burnlevel;
-            if (this.curHp <= 0)
+            this.currentHp = this.currentHp - burnlevel;
+            if (this.currentHp <= 0)
             {
                 TearDrop.Instance.incresing(); Destroy(gameObject);
             }

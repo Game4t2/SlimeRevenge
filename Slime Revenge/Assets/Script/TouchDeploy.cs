@@ -10,6 +10,7 @@ public class TouchDeploy : MonoBehaviour
     private static TouchDeploy Instances;
     [SerializeField]
     private Animator kingAnimator;
+    private BoxCollider2D m_collider;
     public bool controlOn = true;
     public static TouchDeploy Instance { get { return (Instances); } }
 
@@ -31,13 +32,29 @@ public class TouchDeploy : MonoBehaviour
     {
         Instances = this;
         SlimePool.InitPool(m_poolSize);
+        StageController.Instance.onGamePaused += _OnPaused;
+        StageController.Instance.onGameUnpaused += _OnUnpaused;
     }
+
     void Start()
     {
         cam = Camera.main.GetComponent<Cameramove>();
         controlOn = true;
         RandomElementInQueue();
     }
+
+    private void _OnPaused()
+    {
+        kingAnimator.enabled = false;
+        m_collider.enabled = false;
+    }
+
+    private void _OnUnpaused()
+    {
+        kingAnimator.enabled = true;
+        m_collider.enabled = false;
+    }
+
 
     public void RandomElementInQueue()
     {
@@ -110,7 +127,7 @@ public class TouchDeploy : MonoBehaviour
                         _WaitingQueAnimation();
                         Unit newUnit = SlimePool.PoolRequest();
                         GameDatabase.Instance.SlimeDatabase.GetSlimeData(queuedElement[0], 1).CreateInstance(newUnit);
-                        foreach (SlimeUnit s in newUnit.GetComponent<Unit>().slimeUnits)
+                        /*foreach (Unit s in SlimePool.GetPool())
                         {
                             if (s.level == 1)
                             {
@@ -118,7 +135,7 @@ public class TouchDeploy : MonoBehaviour
 
                                 newUnit.gameObject.layer = LayerMask.NameToLayer(myelement.ToString());
                             }
-                        }
+                        }*/
                         StartCoroutine(Throwing(newUnit.gameObject, myelement, position));
                     }
                 }

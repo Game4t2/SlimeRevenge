@@ -38,6 +38,13 @@ public class StageController : MonoBehaviour
 
     private List<GameObject> m_currentUnitGroup;
 
+    public delegate void OnPauseGame();
+    public event OnPauseGame onGamePaused;
+
+    public delegate void OnUnpauseGame();
+    public event OnPauseGame onGameUnpaused;
+
+
     // Use this for initialization
     void Start()
     {
@@ -112,7 +119,7 @@ public class StageController : MonoBehaviour
         currentCoroutine = null;
     }
 
-    private GameObject _SpawnEnemy(Enemy enemy, int lane)
+    private GameObject _SpawnEnemy(EnemyData enemy, int lane)
     {
         GameObject enemyUnit = enemy.CreateInstance();
         Vector3 spawnPosition = Vector3.zero;

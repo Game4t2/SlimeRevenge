@@ -12,8 +12,7 @@ public class Unit : MonoBehaviour
     // public GameObject MyGameObject;
     public Animator anim;
     private bool killed = false;
-    private bool ended;
-    public List<SlimeUnit> slimeUnits;
+    private bool dead;
     private bool canonEmpty = true;
     public bool hited = false;
     private GameObject bullet;
@@ -44,7 +43,8 @@ public class Unit : MonoBehaviour
     }
     void start()
     {
-
+        StageController.Instance.onGamePaused += _OnPaused;
+        StageController.Instance.onGameUnpaused += _OnUnpaused;
     }
 
     private void OnEnable()
@@ -52,45 +52,50 @@ public class Unit : MonoBehaviour
         currentHp = maxHp;
     }
 
-    public void End()
+    private void _OnPaused()
     {
-        if (!ended)
+        anim.enabled = false;
+    }
+
+    private void _OnUnpaused()
+    {
+        anim.enabled = true;
+    }
+
+    private void _Die()
+    {
+        if (!dead)
         {
-            ended = true;
+            dead = true;
 
             if (this.element == Element.Normal && level >= 5)
             {
                 SkillUse.Instance.HeroOnStage = false;
             }
             StopAllCoroutines();
-            StartCoroutine("Death");
+            StartCoroutine("OnDyingCoroutine");
         }
     }
-    IEnumerator Death()
+
+    IEnumerator OnDyingCoroutine()
     {
-        //int i = 0;
-        //i=this.gameObject.layer;
         yield return null;
-        //this.gameObject.layer = LayerMask.NameToLayer("Invis");
 
         anim.SetBool("Attack", false);
         anim.SetBool("Death", true);
         if (killed)
             yield return new WaitForSeconds(0.7f);
         else yield return null;
-        //   this.gameObject.layer = i;
-        //  Debug.Log(LayerMask.LayerToName(this.gameObject.layer));
         sprite.color = Color.white;
         beattack = false;
         anim.SetBool("Death", false);
         anim.SetBool("Attack", false);
-        gameObject.SetActive(false); anim.SetInteger("State", 0);
+        gameObject.SetActive(false);
+        anim.SetInteger("State", 0);
         if (killed)
             ChargeBar.Instance.Increseing();
         killed = false;
-
     }
-
 
 
     public void Attacked(float attack, WinLose enemyWinLose, bool canonShot = false)
@@ -110,18 +115,8 @@ public class Unit : MonoBehaviour
         this.currentHp = this.currentHp - damage;
         if (currentHp <= 0)
         {
-            ///Ver Optimize by using Object pooling
-            /// 
-            /// enable = false;
-            /// 
-            /// Ver Not Optimize using Destroy
             killed = true;
-            End();
-
-            //   gameObject.SetActive(false);
-            //      Destroy(gameObject);
-
-            ///
+            _Die();
         }
 
     }
@@ -143,13 +138,12 @@ public class Unit : MonoBehaviour
 
     IEnumerator BecanonShot()
     {
-
-
         hited = true;
         yield return new WaitForSeconds(0.5f);
 
         hited = false;
     }
+
     IEnumerator AnimationAttacked()
     {
         for (int i = 0; i < 5; i++)
@@ -187,21 +181,25 @@ public class Unit : MonoBehaviour
 
     public void EatToEvol(Unit otherUnit)
     {
-        this.level = (otherUnit.level > this.level) ? otherUnit.level + 1 : this.level + 1;
-        this.level = (this.level >= 5) ? 5 : this.level;
-        this.currentHp = otherUnit.currentHp + this.currentHp;
-        checkLevel(level);
-        if (this.level >= 3)
+        if (this.dead)
+            return;
+        //if my level is higher will absorb smaller and gain new stat
+        if (level > otherUnit.level)
         {
-            anim.SetInteger("State", 2);
-
+            //level was capped at 5
+            GameDatabase.Instance.SlimeDatabase.GetSlimeData(element, Mathf.Min(level + 1, 5)).CreateInstance(this);
+            this.currentHp = otherUnit.currentHp + this.currentHp;
         }
-
+        else
+            _Die();
+        //level won't go over 5
+        level = Mathf.Min(level, 5);
         this.transform.position = otherUnit.transform.position;
 
-        otherUnit.End();
+        otherUnit._Die();
 
     }
+
     private void Attack(RaycastHit2D hit)
     {
 
@@ -288,15 +286,16 @@ public class Unit : MonoBehaviour
             if (hit.collider != null)
             {
                 StageController.Instance.slimeWall.hp = (StageController.Instance.slimeWall.def >= this.atp) ? StageController.Instance.slimeWall.hp - 1 : StageController.Instance.slimeWall.hp - (this.atp - StageController.Instance.slimeWall.def);
-                End();
+                _Die();
             }
             yield return null;
         }///End While
 
     }
-    private void checkLevel(int newlevel)
+
+    /*private void checkLevel(int newlevel)
     {
-        foreach (SlimeUnit slimeUnit in slimeUnits)
+        foreach (Unit slimeUnit in SlimePool.GetPool())
         {
             if (slimeUnit.level == newlevel)
             {
@@ -305,7 +304,7 @@ public class Unit : MonoBehaviour
                 atp = slimeUnit.atp;
                 def = slimeUnit.def;
                 speed = slimeUnit.speed;
-                attackSpeed = slimeUnit.attackspeed;
+                attackSpeed = slimeUnit.attackSpeed;
                 range = slimeUnit.range;
                 attackSpeed = 1.5f - (attackSpeed * 0.12f);
             }
@@ -315,7 +314,9 @@ public class Unit : MonoBehaviour
             StartCoroutine("GrassHealing");
 
 
-    }
+    }*/
+
+
     IEnumerator GrassHealing()
     {
         float radius = 2f;
