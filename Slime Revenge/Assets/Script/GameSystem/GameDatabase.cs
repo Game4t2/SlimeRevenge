@@ -34,7 +34,19 @@ public class GameDatabase : MonoBehaviour
         {
             if (m_enemyDatabase == null)
                 m_enemyDatabase = new EnemyScriptableObject();
-                return m_enemyDatabase;
+            return m_enemyDatabase;
+        }
+    }
+
+    [SerializeField]
+    private SkillScriptableObject m_skillDatabase;
+    public SkillScriptableObject SkillDatabase
+    {
+        get
+        {
+            if (m_skillDatabase == null)
+                m_skillDatabase = new SkillScriptableObject();
+            return m_skillDatabase;
         }
     }
 

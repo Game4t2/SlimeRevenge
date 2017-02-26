@@ -37,4 +37,9 @@ public static class SlimePool
         return slimePool;
     }
 
+    public static List<Unit> GetActiveSlimeList()
+    {
+        return slimePool.FindAll(slime => slime.isActiveAndEnabled == true);
+    }
+
 }

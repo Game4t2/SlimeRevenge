@@ -59,20 +59,9 @@ public class EnemyData
         eu.element = element;
         for (int i = 0; i < specialBehaviour.Count; i++)
         {
-            OnSpawnBehaviour spawnBeh = specialBehaviour[i].GetComponent<OnSpawnBehaviour>();
-            InGameBehaviour inGameBeh = specialBehaviour[i].GetComponent<InGameBehaviour>();
-            if (spawnBeh != null)
-            {
-                GameObject behaviour = GameObject.Instantiate(specialBehaviour[i]);
-                behaviour.transform.SetParent(go.transform);
-                behaviour.transform.localPosition = Vector3.zero;
-            }
-            if (inGameBeh != null)
-            {
-                GameObject behaviour = GameObject.Instantiate(specialBehaviour[i]);
-                behaviour.transform.SetParent(go.transform);
-                behaviour.transform.localPosition = Vector3.zero;
-            }
+            GameObject behaviour = GameObject.Instantiate(specialBehaviour[i]);
+            behaviour.transform.SetParent(go.transform);
+            behaviour.transform.localPosition = Vector3.zero;
         }
 
         return go;

@@ -7,7 +7,7 @@ public class EnemyUnit : MonoBehaviour
     // public Vector3 MyPosition;
     //   public GameObject MyGameObject;
     public Animator anim;
-    
+
     private bool die = false;
     public float maxHp;
     public float currentHp;
@@ -94,6 +94,11 @@ public class EnemyUnit : MonoBehaviour
         return atp;
     }
 
+    public void TakeDamage(float dmg)
+    {
+        this.currentHp = this.currentHp - ((dmg - this.def < 0) ? 0 : dmg - this.def);
+    }
+
     public void Attacked(Unit slime)
     {
         if (!die)
@@ -131,9 +136,10 @@ public class EnemyUnit : MonoBehaviour
                         break;
                     default: break;
                 }
-                this.currentHp = this.currentHp - ((damage - this.def < 0) ? 0 : damage - this.def);
+                TakeDamage(damage);
             }
-            else this.currentHp = this.currentHp - ((damage - this.def < 0) ? 0 : damage - this.def);
+            else
+                TakeDamage(damage);
             if (this.currentHp <= 0)
             {
                 die = true;
@@ -150,7 +156,7 @@ public class EnemyUnit : MonoBehaviour
         }
 
     }
-  
+
     public int CheckHitType(out RaycastHit2D hit)
     {
         Vector2 directionRay = Vector2.left;
@@ -161,7 +167,7 @@ public class EnemyUnit : MonoBehaviour
             source = this.transform.FindChild("Bullet").gameObject.transform.position;
 
         }
-        
+
         hit = Physics2D.Raycast(source, directionRay, range, 1 << LayerMask.NameToLayer("Soil"));
         if (hit.collider != null)
         {
@@ -202,9 +208,9 @@ public class EnemyUnit : MonoBehaviour
             return true;
         }
         return false;
-     }
-  
-    public void Attack(RaycastHit2D hit,bool cannonshot=false)
+    }
+
+    public void Attack(RaycastHit2D hit, bool cannonshot = false)
     {
         if (hit.transform.gameObject.layer != LayerMask.NameToLayer("Wall"))
         {
@@ -219,7 +225,7 @@ public class EnemyUnit : MonoBehaviour
         {
 
             StageController.Instance.slimeWall.hp = ((GetTotalAttack() / 3 - StageController.Instance.slimeWall.def) <= 0) ? StageController.Instance.slimeWall.hp - 1 : StageController.Instance.slimeWall.hp - (GetTotalAttack() / 3 - StageController.Instance.slimeWall.def);
-            if (Mathf.Abs( hit.transform.position.x-this.transform.position.x)<1f)
+            if (Mathf.Abs(hit.transform.position.x - this.transform.position.x) < 1f)
             {
                 Destroy(gameObject);
 
@@ -236,14 +242,15 @@ public class EnemyUnit : MonoBehaviour
         {
             if (hittype <= 2)
             {
-                
-                    anim.SetBool("Attack", true);
-                    if (this.gameObject == null) return false;
-                    else if (hit.transform.gameObject != null)
-                    {
-                        Unit target = hit.transform.gameObject.GetComponent<Unit>();
-                        target.Attacked(GetTotalAttack(), Global.ElementalWeakness(target.element, element));
-                    }return true;
+
+                anim.SetBool("Attack", true);
+                if (this.gameObject == null) return false;
+                else if (hit.transform.gameObject != null)
+                {
+                    Unit target = hit.transform.gameObject.GetComponent<Unit>();
+                    target.Attacked(GetTotalAttack(), Global.ElementalWeakness(target.element, element));
+                }
+                return true;
             }
             else
             {
@@ -261,7 +268,7 @@ public class EnemyUnit : MonoBehaviour
         return false;
     }
     public void multipleAttack() { }
-    
+
 
     IEnumerator Walk()
     {
@@ -274,11 +281,11 @@ public class EnemyUnit : MonoBehaviour
             if (!electricCurse)
             {
 
-               if (type == EnemyUnitType.Gunner)
+                if (type == EnemyUnitType.Gunner)
                 {
                     if (Aim())
                     {
-                        GameObject bullet= this.transform.FindChild("Bullet").gameObject;
+                        GameObject bullet = this.transform.FindChild("Bullet").gameObject;
                         bullet.transform.position = this.transform.position;
                         anim.SetBool("Attack", true);
 
@@ -320,10 +327,10 @@ public class EnemyUnit : MonoBehaviour
                     {
                         RaycastHit2D[] hits = Physics2D.RaycastAll(new Vector2(this.transform.position.x - 1f, this.transform.position.y - 3f), Vector2.up, 6f, 1 << LayerMask.NameToLayer("Soil") | 1 << LayerMask.NameToLayer("Wall") | 1 << LayerMask.NameToLayer("Water") | 1 << LayerMask.NameToLayer("Fire") | 1 << LayerMask.NameToLayer("Electric") | 1 << LayerMask.NameToLayer("Grass") | 1 << LayerMask.NameToLayer("Normal"));
 
-                        foreach(RaycastHit2D inhits in hits)
+                        foreach (RaycastHit2D inhits in hits)
                         {
-                            if(inhits.collider!=null)
-                            Attack(inhits);
+                            if (inhits.collider != null)
+                                Attack(inhits);
                         }
 
                         yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
@@ -361,7 +368,7 @@ public class EnemyUnit : MonoBehaviour
                             foreach (RaycastHit2D inhits in hits)
                             {
                                 if (inhits.collider != null)
-                                    Attack(inhits,true);
+                                    Attack(inhits, true);
                             }
                         }
                         bullet.SetActive(false);

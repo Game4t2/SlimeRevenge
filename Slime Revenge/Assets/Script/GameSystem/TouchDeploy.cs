@@ -62,6 +62,11 @@ public class TouchDeploy : MonoBehaviour
         _WaitingQueAnimation();
     }
 
+    public Element GetRandomElementInQueue()
+    {
+        return queuedElement[Random.Range(0, queuedElement.Length)];
+    }
+
     private List<Element> GetUniqueElements(int length)
     {
         if (System.Enum.GetNames(typeof(Element)).Length < length)
@@ -125,22 +130,19 @@ public class TouchDeploy : MonoBehaviour
                         _ReorderQueue();
 
                         _WaitingQueAnimation();
-                        Unit newUnit = SlimePool.PoolRequest();
-                        GameDatabase.Instance.SlimeDatabase.GetSlimeData(queuedElement[0], 1).CreateInstance(newUnit);
-                        /*foreach (Unit s in SlimePool.GetPool())
-                        {
-                            if (s.level == 1)
-                            {
-                                //newUnit.GetComponent<Unit>().Set(s);
-
-                                newUnit.gameObject.layer = LayerMask.NameToLayer(myelement.ToString());
-                            }
-                        }*/
-                        StartCoroutine(Throwing(newUnit.gameObject, myelement, position));
+                      
+                        CreateSlime(queuedElement[0], 1, position);
                     }
                 }
             }
         }
+    }
+
+    public void CreateSlime(Element elem, int level, Vector3 position)
+    {
+        Unit newUnit = SlimePool.PoolRequest();
+        GameDatabase.Instance.SlimeDatabase.GetSlimeData(elem, 1).CreateInstance(newUnit);
+        StartCoroutine(Throwing(newUnit.gameObject, elem, position));
     }
 
     private void _ReorderQueue()
