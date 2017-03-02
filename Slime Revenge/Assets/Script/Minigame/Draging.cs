@@ -18,7 +18,6 @@ public class Draging : MonoBehaviour {
         {
             startPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             
-
         }
         if (Input.GetMouseButtonUp(0))
         {

@@ -5,14 +5,15 @@ using UnityEngine.UI;
 public class ScreenRoll : MonoBehaviour
 {
     private float speed=1f;
-    public float sensitive=7f;
-    private int maxscene = 4;
+    public float sceneChangeSensitive=7f;
+    public float mouseSensitive = 1f;
+    private int maxscene = 3;
     private bool mouseTouch = false;
     private int movePattern=0;
     private Vector2 startPos;
     private Vector2 mousePos;
     private Vector2 prevMousePos;
-    private Vector3[] screenPos = new Vector3[4];
+    private Vector3[] screenPos = new Vector3[3];
     // Use this for initialization
     void Start()
     {   for (int i = 0; i < maxscene; i++)
@@ -61,21 +62,24 @@ public class ScreenRoll : MonoBehaviour
         {
             mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             for (int i = 0; i < maxscene; i++) {
-                Vector3 pos = this.transform.GetChild(i).transform.position;
-                this.transform.GetChild(i).Translate((mousePos.x - prevMousePos.x)*speed,0,0);
+                if (Mathf.Abs(mousePos.x - startPos.x) > mouseSensitive)
+                {
+                    Vector3 pos = this.transform.GetChild(i).transform.position;
+                    this.transform.GetChild(i).Translate((mousePos.x - prevMousePos.x) * speed, 0, 0);
+                }
             }
           
             prevMousePos = mousePos;
         }
         if (Input.GetMouseButtonUp(0) && mouseTouch)
         {
-            if (mousePos.x > startPos.x + sensitive)
+            if (mousePos.x > startPos.x + sceneChangeSensitive)
             {
 
                 RotateScreen(true);
                 startPos = mousePos;
             }
-            if (mousePos.x < startPos.x - sensitive)
+            if (mousePos.x < startPos.x - sceneChangeSensitive)
             {
 
                 RotateScreen(false);

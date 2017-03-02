@@ -17,13 +17,17 @@ public class GachaRandom : MonoBehaviour {
     private Text saltDisplay;
     private Text tentimeText;
     private GameObject confirmPanel;
-    private Text confirmPharse;
-  
+    private Text confirmPharse1;
+    private Text confirmPharse2;
+    private Text confirmPharse3;
     // Use this for initialization
     void Start () {
 
         confirmPanel = this.transform.FindChild("Confirmation").gameObject;
-        confirmPharse = this.transform.FindChild("Confirmation").gameObject.transform.GetChild(1).gameObject.GetComponent<Text>();
+        confirmPharse1 = this.transform.FindChild("Confirmation").gameObject.transform.FindChild("Textsalt").gameObject.GetComponent<Text>();
+        confirmPharse2 = this.transform.FindChild("Confirmation").gameObject.transform.FindChild("TextSaltNow").gameObject.GetComponent<Text>();
+        confirmPharse3 = this.transform.FindChild("Confirmation").gameObject.transform.FindChild("TextSaltAfter").gameObject.GetComponent<Text>();
+
         slimeHammer = this.transform.FindChild("SlimeHammer").gameObject.GetComponent<Animator>();
         tentimebutton = this.transform.FindChild("10 time").gameObject.GetComponent<Button>();
         tentimeText = this.transform.FindChild("10 time").GetChild(0).gameObject.GetComponent<Text>();
@@ -40,7 +44,10 @@ public class GachaRandom : MonoBehaviour {
             if (time > 10) time = 10;
             gachaPieces = time;
             confirmPanel.SetActive(true);
-            confirmPharse.text = "Are you sure To spend " + (gachaPieces * 10).ToString() + " salt? \n" + salt.ToString() + " To " + (salt - gachaPieces * 10).ToString();
+            confirmPharse1.text = (gachaPieces * 10).ToString()+"salt";
+            confirmPharse2.text =  salt.ToString()+"salt";
+            confirmPharse3.text = (salt - gachaPieces * 10).ToString()+"salt";
+
         }
     }
     public void SetGacha1Time()
@@ -49,7 +56,10 @@ public class GachaRandom : MonoBehaviour {
         {
             gachaPieces = 1;
             confirmPanel.SetActive(true);
-            confirmPharse.text = "Are you sure To spend " + (gachaPieces * 10).ToString() + " salt? \n" + salt.ToString() + " To " + (salt - gachaPieces * 10).ToString();
+            confirmPharse1.text = (gachaPieces * 10).ToString() + "salt";
+            confirmPharse2.text = salt.ToString() + "salt";
+            confirmPharse3.text = (salt - gachaPieces * 10).ToString() + "salt";
+
         }
     }
 
