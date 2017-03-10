@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class GachaRandom : MonoBehaviour {
     private bool clicked = false;
-    public List<GameObject> groupNormal;
-    public List<GameObject> groupRare;
-    public List<GameObject> groupSRare;
+    public List<SkillData> groupNormal;
+    public List<SkillData> groupRare;
+    public List<SkillData> groupSRare;
     public int salt;
     private int gachaPieces;
     private GameObject result;
@@ -22,6 +22,17 @@ public class GachaRandom : MonoBehaviour {
     private Text confirmPharse3;
     // Use this for initialization
     void Start () {
+
+        GameDatabase.Instance.SkillDatabase.GetSkillRate("Normal", groupNormal);
+        GameDatabase.Instance.SkillDatabase.GetSkillRate("Rare", groupRare);
+        GameDatabase.Instance.SkillDatabase.GetSkillRate("SRare", groupSRare);
+
+
+
+
+
+
+
 
         confirmPanel = this.transform.FindChild("Confirmation").gameObject;
         confirmPharse1 = this.transform.FindChild("Confirmation").gameObject.transform.FindChild("Textsalt").gameObject.GetComponent<Text>();
@@ -106,14 +117,22 @@ public class GachaRandom : MonoBehaviour {
         slimeHammer.SetBool("Attack", false);
         clicked = false;
     }
-    public void ResultGacha(List<GameObject> output)
+    public void ResultGacha(List<SkillData> output)
     {
         StartCoroutine("runResult");
         for (int i = 1; i <= output.Count; i++)
         {
             result.transform.GetChild(i).gameObject.SetActive(true);
-            result.transform.GetChild(i).GetComponent<RawImage>().texture = output[i - 1].GetComponent<SpriteRenderer>().sprite.texture;
-            result.transform.GetChild(i).GetComponent<RawImage>().color = output[i - 1].GetComponent<SpriteRenderer>().color;
+            result.transform.GetChild(i).GetComponent<RawImage>().texture = output[i - 1].skillSprite.texture;
+        
+          if (  GameDatabase.Instance.MySkillDatabase.GetSkill(output[i - 1].skillID) != null)
+            {
+                GameDatabase.Instance.MySkillDatabase.GetSkill(output[i - 1].skillID).total++;
+            }
+            else
+            {
+                GameDatabase.Instance.MySkillDatabase.list.Add(output[i - 1]);
+            }
         }
 
     }
@@ -127,9 +146,9 @@ public class GachaRandom : MonoBehaviour {
 
 
     }
-    private List<GameObject> StartRandom(int time)
+    private List<SkillData> StartRandom(int time)
     {
-        List<GameObject> output = new List<GameObject>();
+        List<SkillData> output = new List<SkillData>();
 
         for(int i = 0; i < time; i++)
         {
@@ -141,7 +160,8 @@ public class GachaRandom : MonoBehaviour {
         }
         return output;
     }
-    private GameObject RandomType(int level)
+
+    private SkillData RandomType(int level)
     {
         int x = 99;
         if (level < 3)
