@@ -50,4 +50,18 @@ public class GameDatabase : MonoBehaviour
         }
     }
 
+
+    [SerializeField]
+    private SkillScriptableObject m_myskillDatabase;
+    public SkillScriptableObject MySkillDatabase
+    {
+        get
+        {
+            if (m_myskillDatabase == null)
+                m_myskillDatabase = new SkillScriptableObject();
+            return MySkillDatabase;
+        }
+    }
+
+
 }

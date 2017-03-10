@@ -17,6 +17,18 @@ public class SkillScriptableObject : ScriptableObject
         return null;
     }
 
+    public void GetSkillRate(string rate,List<SkillData> listOfskill)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i].rate == rate)
+                listOfskill.Add(list[i]);
+        }
+        Debug.LogError("Invalid skill id requested," + rate);
+    
+    }
+
+
 }
 
 
@@ -25,6 +37,8 @@ public class SkillData
 {
     public string skillID;
     public string displayName;
+    public string rate;
+    public int total;
     public Sprite skillSprite;
     public GameObject skillPrefab;
 }
