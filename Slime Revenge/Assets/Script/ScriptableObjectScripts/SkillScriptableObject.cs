@@ -38,6 +38,9 @@ public class SkillData
     public string skillID;
     public string displayName;
     public string rate;
+
+    public int maxlevel;
+    public int level;
     public int total;
     public Sprite skillSprite;
     public GameObject skillPrefab;
