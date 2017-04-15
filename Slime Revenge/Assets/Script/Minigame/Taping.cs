@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
-
+using System.Collections.Generic;
 public class Taping : MonoBehaviour {
     public int point=0;
-    public bool destroyAftertouch;
-    public bool enableTouch;
+    public bool multiplePoint;
+
+    public List<Vector3> tapPosition = new List<Vector3>();
+   // public bool enableTouch;
 	// Use this for initialization
 	void Start () {
 	
@@ -17,24 +20,17 @@ public class Taping : MonoBehaviour {
 
     public void Tap()
     {
-        if (enableTouch)
-        {
             point++;
-            if (destroyAftertouch)
+            Debug.Log(point);
+            if (multiplePoint)
             {
-                Destroy(this.gameObject);
+                this.gameObject.transform.position = tapPosition[point%tapPosition.Count];
             }
-        }
+        
     }
-    public void Tap(int pointPlus)
+    void ClearPoint()
     {
-        if (enableTouch)
-        {
-            point=point+pointPlus;
-            if (destroyAftertouch)
-            {
-                Destroy(this.gameObject);
-            }
-        }
+        point = 0;
     }
+   
 }
