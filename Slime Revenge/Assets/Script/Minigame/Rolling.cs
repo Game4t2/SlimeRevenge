@@ -13,6 +13,7 @@ public class Rolling : MonoBehaviour {
 	// Use this for initialization
     void Start()
     {
+        point = 0;
         for (int i = 0; i < 5; i++)
             checkpoint[i] = false;
         Debug.Log(checkpoint[0] + "" + checkpoint[1] + " " + checkpoint[2] + " " + checkpoint[3] + " " + checkpoint[4]);
@@ -94,8 +95,8 @@ public class Rolling : MonoBehaviour {
         }
 	}
 
-    public void CheckPassingPoint(float angle)
+    public void cleraPoint()
     {
-                
+        point = 0;
     }
 }

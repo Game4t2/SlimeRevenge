@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LenAttack : MonoBehaviour {
+public class LaneAttack : MonoBehaviour {
     public float damage = 0;
 	// Use this for initialization
 	void Start () {
@@ -13,25 +13,26 @@ public class LenAttack : MonoBehaviour {
 	void Update () {
 		
 	}
-    void SetDamage(float dmg)
+  public  void SetDamage(float dmg)
     {
         damage = dmg;
 
     }
 
-    void EnemyAttacked(float lenY)
+    public bool EnemyAttacked(float laneY)
     {
      GameObject[] Enemy=  GameObject.FindGameObjectsWithTag("Human");
         for(int i = 0; i < Enemy.Length; i++)
         {
 
-            if (Enemy[i].transform.position.y>lenY+0.1f|| Enemy[i].transform.position.y < lenY - 0.1f)
+            if (Enemy[i].transform.position.y> laneY - 0.5f|| Enemy[i].transform.position.y < laneY + 0.5f)
             {
                 Enemy[i].GetComponent<EnemyUnit>().currentHp -= damage;
 
             }
 
         }
+        return true;
 
     }
 }
