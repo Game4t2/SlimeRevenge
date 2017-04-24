@@ -110,15 +110,17 @@ public class Unit : MonoBehaviour
         float damage = attack;
         if (enemyWinLose == WinLose.win) { damage *= 2; }
         else if ((enemyWinLose == WinLose.lose)) { damage = damage / 2; }
-
-        damage = damage < def ? 0 : damage - def;
-        this.currentHp = this.currentHp - damage;
+        TakeDamage(damage);
         if (currentHp <= 0)
         {
             killed = true;
             _Die();
         }
+    }
 
+    public void TakeDamage(float dmg)
+    {
+        this.currentHp = this.currentHp - ((dmg - this.def < 0) ? 0 : dmg - this.def);
     }
 
     public float GetTotalAttack()

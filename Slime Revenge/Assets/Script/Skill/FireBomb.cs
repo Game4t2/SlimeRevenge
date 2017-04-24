@@ -9,7 +9,7 @@ public class FireBomb : MonoBehaviour
     public bool allowMultihit;
 
     // Use this for initialization
-    void Start()
+    public void Start()
     {
         List<EnemyUnit> exploded = new List<EnemyUnit>();
         List<Unit> list = SlimePool.GetActiveSlimeList();

@@ -32,6 +32,12 @@ public static class EnemyPool
         return newEnemy;
     }
 
+    public static List<EnemyUnit> GetActiveEnemyList()
+    {
+
+        return enemyPool.FindAll(enemy => enemy.isActiveAndEnabled == true);
+    }
+
     public static List<EnemyUnit> GetPool()
     {
         return enemyPool;
