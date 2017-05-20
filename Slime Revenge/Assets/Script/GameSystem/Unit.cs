@@ -62,7 +62,7 @@ public class Unit : MonoBehaviour
         anim.enabled = true;
     }
 
-    private void _Die()
+    public void _Die()
     {
         if (!dead)
         {
@@ -120,9 +120,64 @@ public class Unit : MonoBehaviour
 
     public void TakeDamage(float dmg)
     {
-        this.currentHp = this.currentHp - ((dmg - this.def < 0) ? 0 : dmg - this.def);
+
+        this.currentHp = this.currentHp - ((dmg - GetTotalDefence() < 0) ? 0 : dmg - GetTotalDefence());
     }
 
+
+    ///// Buff & Debuff////
+    public float GetTotalSpeed()
+    {
+        float totalspeed = speed;
+        List<FieldEffect> list = FieldEffectController.GetSlimeFieldEffect();
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i].targetStatus == "speed" && list[i].effect == FieldEffect.EffectType.Buff)
+                totalspeed = totalspeed + (speed * list[i].effectPower);
+            else if (list[i].targetStatus == "speed" && list[i].effect == FieldEffect.EffectType.Debuff)
+                totalspeed = totalspeed - (speed * list[i].effectPower);
+        }
+        return totalspeed;
+    }
+    public float GetTotalAttackSpeed()
+    {
+        float totalattackSpeed = attackSpeed;
+        List<FieldEffect> list = FieldEffectController.GetSlimeFieldEffect();
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i].targetStatus == "attackSpeed" && list[i].effect == FieldEffect.EffectType.Buff)
+                totalattackSpeed = totalattackSpeed - (attackSpeed * list[i].effectPower);
+            else if (list[i].targetStatus == "attackSpeed" && list[i].effect == FieldEffect.EffectType.Debuff)
+                totalattackSpeed = totalattackSpeed + (attackSpeed * list[i].effectPower);
+        }
+        return totalattackSpeed;
+    }
+    public float GetTotalRange()
+    {
+        float totalrange = range;
+        List<FieldEffect> list = FieldEffectController.GetSlimeFieldEffect();
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i].targetStatus == "range" && list[i].effect == FieldEffect.EffectType.Buff)
+                totalrange = totalrange + (range * list[i].effectPower);
+            else if (list[i].targetStatus == "range" && list[i].effect == FieldEffect.EffectType.Debuff)
+                totalrange = totalrange - (range * list[i].effectPower);
+        }
+        return totalrange;
+    }
+    public float GetTotalDefence()
+    {
+        float totalDef = def;
+        List<FieldEffect> list = FieldEffectController.GetSlimeFieldEffect();
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i].targetStatus == "def" && list[i].effect == FieldEffect.EffectType.Buff)
+                totalDef = totalDef + (def * list[i].effectPower);
+            else if (list[i].targetStatus == "def" && list[i].effect == FieldEffect.EffectType.Debuff)
+                totalDef = totalDef - (def * list[i].effectPower);
+        }
+        return totalDef;
+    }
     public float GetTotalAttack()
     {
         float totalAttack = atp;
@@ -136,7 +191,7 @@ public class Unit : MonoBehaviour
         }
         return totalAttack;
     }
-
+   
 
     IEnumerator BecanonShot()
     {
@@ -229,7 +284,7 @@ public class Unit : MonoBehaviour
             {
                 while (another.gameObject.activeInHierarchy)///walkTotarget
                 {
-                    this.transform.position = Vector3.MoveTowards(this.transform.position, another.transform.position, this.speed * 3f * Time.deltaTime);
+                    this.transform.position = Vector3.MoveTowards(this.transform.position, another.transform.position, GetTotalSpeed() * 3f * Time.deltaTime);
                     yield return null;
                     if (this.transform.position.x > another.transform.position.x - 0.2f) break;
                 }
@@ -241,17 +296,17 @@ public class Unit : MonoBehaviour
             /////Check Attacked Enemy
             if (this.element != Element.Normal)/// CheckEnemy (checkthis is maleenunit(Element+MaleeType))
             {
-                hit = Physics2D.Raycast(this.transform.position, Vector2.right, range, 1 << LayerMask.NameToLayer("EUnit"));
+                hit = Physics2D.Raycast(this.transform.position, Vector2.right, GetTotalRange(), 1 << LayerMask.NameToLayer("EUnit"));
                 if (hit.collider != null)
                 {
 
                     anim.SetBool("Attack", true);
                     Attack(hit);
-                    yield return new WaitForSeconds(attackSpeed);
+                    yield return new WaitForSeconds(GetTotalAttackSpeed());
                     anim.SetBool("Attack", false);
                 }
 
-                else { this.transform.position += Vector3.right * Time.deltaTime * speed; }
+                else { this.transform.position += Vector3.right * Time.deltaTime * GetTotalSpeed(); }
             }
 
             else if (element == Element.Normal && level == 5)////Attack of KingGuard
@@ -259,7 +314,7 @@ public class Unit : MonoBehaviour
                 found = false;
                 for (int i = 0; i < 3; i++)
                 {
-                    RaycastHit2D[] hits = Physics2D.RaycastAll(new Vector2(this.transform.position.x, GameObject.Find("Len").transform.GetChild(i).transform.position.y), Vector2.right, range, 1 << LayerMask.NameToLayer("EUnit"));
+                    RaycastHit2D[] hits = Physics2D.RaycastAll(new Vector2(this.transform.position.x, GameObject.Find("Len").transform.GetChild(i).transform.position.y), Vector2.right, GetTotalRange(), 1 << LayerMask.NameToLayer("EUnit"));
                     if (hits.Length < 1) continue;
                     this.gameObject.transform.GetChild(0).gameObject.SetActive(true);///effectof KING on
                     foreach (RaycastHit2D inhit in hits)
@@ -272,11 +327,11 @@ public class Unit : MonoBehaviour
                 }
                 if (!found)//walk
                 {
-                    this.transform.position += Vector3.right * Time.deltaTime * speed;
+                    this.transform.position += Vector3.right * Time.deltaTime * GetTotalSpeed();
                 }
                 else
                 {
-                    yield return new WaitForSeconds(attackSpeed);
+                    yield return new WaitForSeconds(GetTotalAttackSpeed());
 
                     this.gameObject.transform.GetChild(0).gameObject.SetActive(false);
                     anim.SetBool("Attack", false);

@@ -2,7 +2,8 @@
 using System.Collections;
 
 public class Wall : MonoBehaviour
-{
+{public static Wall Instance { get { return instance; } }
+    private static Wall instance;
     private Animator anim;
     private bool destroyed = false;
     public float hp = 100;
@@ -12,7 +13,8 @@ public class Wall : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        anim = this.GetComponent<Animator>();
+        instance = this;
+           anim = this.GetComponent<Animator>();
     }
 
     // Update is called once per frame
